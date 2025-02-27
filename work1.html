@@ -6,6 +6,20 @@
     <title>Document</title>
 </head>
 <body>
-    第一个作业测试
+    <form action="">
+        <input type="text" id="name">
+        <input type="button" id="commit" onclick="showName"></input>
+    </form>
+    <div>
+        <p id="show"></p>
+    </div>
+    <script>
+        var name = document.getElementById("name");
+        showName = function(){
+            var show = document.getElementById("show");
+            show.innerHTML = name.value;
+        }
+        
+    </script>
 </body>
 </html>
