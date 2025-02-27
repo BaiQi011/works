@@ -3,23 +3,31 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>class1</title>
 </head>
 <body>
-    <form action="">
+    <!-- <form action=""> -->
         <input type="text" id="name">
-        <input type="button" id="commit" onclick="showName"></input>
-    </form>
-    <div>
-        <p id="show"></p>
-    </div>
+        <!-- <input type="button" id="commit" value="提交"></input> -->
+    <!-- </form> -->
+    <button id="commit">提交</button>
+    <div id="show"></div>
     <script>
-        var name = document.getElementById("name");
-        showName = function(){
-            var show = document.getElementById("show");
-            show.innerHTML = name.value;
-        }
         
+        window.onload = function(){
+            document.getElementById('commit').onclick = function(){
+                var name = document.getElementById('name').value;
+                document.getElementById('show').innerHTML = name;
+            }
+        }
+
+        // function showName(){
+        //     var name = document.getElementById("name");
+        //     var show = document.getElementById("show");
+        //     show.innerHTML = name.value;
+        // }
+        // // 获取按钮元素并添加点击事件监听器
+        // document.getElementById('commit').addEventListener('click', showName);
     </script>
 </body>
 </html>
