@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>class2</title>
+</head>
+<body>
+    <!-- 
+    1.let: 块级作用域 
+    2.变量式函数调用必须在函数声明之后，原因：var的声明会提升，函数体不会提升
+    3.不加var/let相关的变量，变量会编程window的变量
+    4.true+false=1
+    5.arguments 是一个类数组，和数组相似，没有数组的方法，只有length属性
+    6.use strict: 严格模式
+    -->
+    <input type="text" id="x">
+    <input type="text" id="y">
+    <button onclick="action()">sum</button>
+    <script>
+        var a = 1;
+        for (let i = 2; i <= 10; i++) {
+            a *= i;
+        }
+        console.log(a);
+
+        function action(){
+            x = parseInt(document.getElementById("x").value);
+            y = parseInt(document.getElementById("y").value);
+            fun(x, y);
+        }
+        function fun(x, y){
+            for (let i = x+1; i <= y; i++){
+                x += i;
+            }
+            console.log(x);
+        }
+
+        // 定义+调用(立即执行函数)
+        ;(function(word){
+            console.log("hello " + word);
+        })('world')
+    </script>
+</body>
+</html>

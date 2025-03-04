@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>作业1</title>
+</head>
+<body>
+    <!-- 229970507-封鉴纹 -->
+    <script>
+        // 三角形
+        for (let i = 0; i < 5; i++) {
+            for (let j = 5-i-1; j >= 0 ; j--) {
+                document.write("&nbsp&nbsp;");
+            }
+            for (let j = 0; j <= i; j++) {
+                document.write("*");
+                document.write("&nbsp&nbsp;");
+            }
+            document.write("<br>");
+        }
+        // 平行四边形
+        for (let i = 0; i < 5; i++) {
+            for (let j = 5-i-1; j >= 0 ; j--) {
+                document.write("&nbsp&nbsp;");
+            }
+            for (let j = 0; j < 5; j++) {
+                document.write("*");
+                document.write("&nbsp&nbsp;");
+            }
+            document.write("<br>");
+        }
+        // 菱形(229907507-封鉴纹)
+        let output = "";
+        for (let i = 1; i <= 5; i++) {
+            // 计算空格数量
+            let spaces = Math.abs(3 - i)*2; // 第3行
+            // 计算星号数量
+            let stars = 5 - 2 * Math.abs(3 - i);
+            for (let j = 0; j < spaces; j++) {
+                output += "&nbsp;&nbsp;";
+            }
+            for (let j = 0; j < stars; j++) {
+                output += "*&nbsp;&nbsp;";
+            }
+            output += "<br>";
+        }
+        document.write(output);
+    </script>
+</body>
+</html>
