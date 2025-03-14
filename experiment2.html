@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>实验2</title>
+</head>
+<body>
+    <script>
+        // 229970507 封鉴纹
+        // 1(1) Number()
+        console.log(Number(true), Number(null), +undefined);
+        // 1(2) Boolean()
+        console.log(Boolean('100'), Boolean(100), Boolean(null), !!undefined);
+        // 1(3) parseInt()
+        console.log(parseInt(123.6), parseInt(0b1011011), parseInt(0x2A), parseInt(0x2A, 8));
+        // 1(4) parseFloat()
+        console.log(parseFloat('123.6'), parseFloat('100px'), parseFloat(010));
+        // 1(5) eval() 执行字符串形式的 JavaScript 代码
+        console.log(eval('87*99+2'));
+        // 1(6) toString()
+        console.log(isNaN(null), isNaN('123'), isNaN('abc'), isNaN('a1b2c3'));
+
+        // 2(1)
+        var arr1 = [];
+        console.log(arr1, arr1.length)
+        var arr2 = [1, 2, 3];
+        console.log(arr2[0], arr2.length);
+        var arr3 = new Array();
+        console.log(arr3[1], arr3.length);
+        // 2(2) 数组 arr2 的第一个元素去掉
+        arr2.shift();
+        console.log(arr2);
+
+        // 229970507 封鉴纹
+        // 3 日期和时间
+        var date = new Date();
+        var h = date.getHours();
+        var m = date.getMinutes();
+        console.log(h+':'+m);
+
+        // 4(1) 
+        var reg1 = /^\d{4}$/; // 匹配四位数字
+        console.log(reg1.test('1234'),
+            reg1.test('1a34'),
+            reg1.test('12345'))
+        // 4(2) 匹配s,p开头的数字，i表示不区分大小写
+        var reg2 = new RegExp("^[sp]\\d{1,4}$","i"); 
+        console.log(reg2.test('p123'),
+            reg2.test('1234'),
+            reg2.test('S10'))
+        // 4(3) 中国电信的正则表达式
+        var reg3 = /^1(33|53|89|91|93|99)\d{8}$/;
+        console.log(reg3.test('13312345678'),
+            reg3.test('138123456789'),
+            reg3.test('1931234567'))
+        
+        // 5 string 对象 -- 提取QQ号码
+        var str = '1182327866@qq.com'
+        console.log(str.split('@')[0]) //start,end
+        console.log(str.substring(0, 10)) // start,length
+
+        // 6 Math 对象
+        console.log(Math.ceil(Math.random()*3));
+
+        // 7
+        var x = 1;
+        function A(y){
+            var x = 2;
+            function B(z){
+                console.log(x+y+z); //x = 2, y = 2, z = 3
+            }
+            return B;
+        }
+        var C = A(2); //B()
+        C(3); // B(3)
+    </script>
+</body>
+</html>

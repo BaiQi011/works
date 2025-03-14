@@ -7,6 +7,7 @@
 </head>
 <body>
     <script>
+        // 229970507-封鉴纹
         // 问题1
         getSum(2,3); // 将输出 2+3=5
         function getSum(num1, num2){
@@ -31,16 +32,16 @@
         }
         test();
         console.log(a); //10
-        // 问题4
-        var a = 10;
-        console.log('问题4:');
-        fun1();
-        function fun1(){
-            var b = 20;
-            console.log(a); //10
-            console.log(b); //20
-            var a = 30;
-        }
+        // // 问题4
+        // var a = 10;
+        // console.log('问题4:');
+        // fun1();
+        // function fun1(){
+        //     var b = 20;
+        //     console.log(a); //10
+        //     console.log(b); //20
+        //     var a = 30;
+        // }
         // 问题5-不报错
         // console.log('问题5:');
         // function fun2(a, b) {
@@ -52,36 +53,37 @@
 
         // 229970507-封鉴纹
         // 问题6
-        // function fun2(a, b) {
-        //     for (let index in arguments) {
-        //         console.log('问题6:'+arguments[index]);
-        //     }
-        // }
+        function fun2(a, b) {
+            for (let index in arguments) {
+                console.log('问题6:'+arguments[index]);
+            }
+        }
         // 示例调用
-        // fun2(1, 2, 3);              
+        fun2(1, 2, 3);              
     </script>
-    <!-- <script>
+    <script>
         // 问题7
         // 在严格模式下会报错，因为变量 num 未声明。
         // 错误信息为 ReferenceError: num is not defined。
+        "use strict";
         console.log('问题7:');
-        "use strict";
         num = 100;
-    </script> -->
-    <script>
-        // 问题8
-        console.log('问题8:');
-        "use strict";
-        function foo(a, a, b) { // 报错：Duplicate parameter name not allowed in this context
-            console.log(a, b);
-        }
     </script>
     <!-- <script>
-        // // 问题9
-        console.log('问题9:');
+        // 问题8
         "use strict";
+        console.log('问题8:');
+        function foo(a, a, b) { // 报错:严格模式下，JS 不允许重复声明变量。
+            // 229970507-封鉴纹
+            console.log(a, b);
+        }
+    </script> -->
+    <!-- <script>
+        // // 问题9
+        "use strict";
+        console.log('问题9:');
         try {
-            function foo(a, a, b) { // 这行代码会报错
+            function foo(a, a, b) { // 报错
                 console.log(a, b);
             }
         } catch (error) {
