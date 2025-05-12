@@ -72,7 +72,6 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            padding: 40px;
             background: #ffffff;
             transition: transform 0.2s ease;
             overflow: hidden;
@@ -92,6 +91,19 @@
             display: block;
         }
 
+        /* 去掉原来样式 */
+        .phone-item-a {
+            text-decoration: none;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            background: #ffffff;
+            padding: 40px;
+            transition: transform 0.2s ease;
+            overflow: hidden;
+        }
 
         /* 文字内容区域 */
         .phone-content {
@@ -144,27 +156,29 @@
     </style>
 </head>
 <body>
+    <!-- 229970507-封鉴纹 -->
     <div id="app" class="container">
         <div class="section-header">
             <h2 class="section-title">手机</h2>
             <a href="#" class="more-link">查看更多 ></a>
         </div>
-        
         <div class="phone-container">
-            <!-- 左侧大图商品（占满高度） -->
+            <!-- 左侧大图商品 -->
             <div class="phone-left">
                 <img src="./img/xiaomi-left.png" alt="">
             </div>
 
-            <!-- 右侧商品列表（两行，每行4个） -->
+            <!-- 右侧商品列表 -->
             <ul class="phone-list">
                 <li class="phone-item" v-for="phone in phoneList" :key="phone.id">
-                    <img :src="phone.img" alt="小米手机" class="phone-img">
-                    <div class="phone-content">
-                        <h3 class="phone-title">{{ phone.title }}</h3>
-                        <p class="phone-des">{{ phone.des }}</p>
-                        <p class="phone-price">{{ phone.price }}</p>
-                    </div>
+                    <a :href="phone.url" class="phone-item-a">
+                        <img :src="phone.img" alt="小米手机" class="phone-img">
+                        <div class="phone-content">
+                            <h3 class="phone-title">{{ phone.title }}</h3>
+                            <p class="phone-des">{{ phone.des }}</p>
+                            <p class="phone-price">{{ phone.price }}</p>
+                        </div>
+                    </a>
                 </li>
             </ul>
         </div>
@@ -183,56 +197,64 @@
                             img: "./img/xiaomi1.png",
                             title: "Redmi K50 电竞版",
                             des: "全新骁龙8 Gen1处理器，120W极速快充，120Hz柔性直屏",
-                            price: "2999元起"
+                            price: "2999元起",
+                            url: "https://www.mi.com/in/redmi-k50-electronic-edition/"
                         },
                         {
                             id: "10002",
                             img: "./img/xiaomi2.png",
                             title: "小米12 Pro",
                             des: "2K AMOLED大屏，5000万像素三摄，4600mAh大电池",
-                            price: "4699元起"
+                            price: "4699元起",
+                            url: "https://www.mi.com/in/redmi-12-pro/"
                         },
                         {
                             id: "10003",
                             img: "./img/xiaomi3.png",
                             title: "Redmi Note 11",
                             des: "5000mAh长续航，120Hz高刷屏，天玑920处理器",
-                            price: "1299元起"
+                            price: "1299元起",
+                            url: "https://www.mi.com/in/redmi-note-11/"
                         },
                         {
                             id: "10004",
                             img: "./img/xiaomi4.png",
                             title: "小米MIX FOLD",
                             des: "折叠屏设计，骁龙888处理器，哈曼卡顿立体声",
-                            price: "9999元起"
+                            price: "9999元起",
+                            url: "https://www.mi.com/in/redmi-mix-fold/"
                         },
                         {
                             id: "10005",
                             img: "./img/xiaomi5.png",
                             title: "Redmi K50 Pro",
                             des: "天玑9000处理器，2K直屏，5000mAh大电池",
-                            price: "3599元起"
+                            price: "3599元起",
+                            url: "https://www.mi.com/in/redmi-k50-pro/"
                         },
                         {
                             id: "10006",
                             img: "./img/xiaomi6.png",
                             title: "Redmi Note 11 Pro",
                             des: "120Hz高刷屏，骁龙888处理器，5000mAh大电池",
-                            price: "1699元起"
+                            price: "1699元起",
+                            url: "https://www.mi.com/in/redmi-note-11-pro/"
                         },
                         {
                             id: "10007",
                             img: "./img/xiaomi7.png",
                             title: "Redmi K80 Pro",
                             des: "第三代骁龙8|2k新国屏，6500mAh大电池",
-                            price: "2499元起"
+                            price: "2499元起",
+                            url: "https://www.mi.com/in/redmi-k80-pro/"
                         },
                         {
                             id: "10008",
                             img: "./img/xiaomi8.png",
                             title: "Xiaomi 15",
                             des: "徕卡光学Summilux 高速镜头，120Hz高刷屏",
-                            price: "4199元起"
+                            price: "4199元起",
+                            url: "https://www.mi.com/in/xiaomi-15/"
                         }
                         
                     ]
