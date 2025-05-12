@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>vue3</title>
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js  "></script>
+</head>
+<body>
+    <!-- 用于挂载 Vue 应用的元素 -->
+    <div id="app"></div>
+    <template id="root">
+        <button @click="increment">+</button>
+        <input type="text" v-model="mynumber">
+        <button @click="decrement">-</button>
+    </template>
+    <script>
+        const { createApp } = Vue;
+        const app = createApp({
+            template: '#root',
+            data() {
+                return {
+                    mynumber: 0
+                };
+            },
+            methods: {
+                increment() {
+                    this.mynumber++;
+                },
+                decrement() {
+                    this.mynumber--;
+                }
+            }
+        });
+        // 挂载到 #app 元素
+        app.mount("#app");
+
+
+        // $event 事件对象，函数没有传参自动传递event对象
+        // stop修饰符：阻止事件冒泡(例如：@click.stop="handleClick")
+        // prevent修饰符：阻止默认行为(例如a标签阻止默认跳转：@click.prevent="handleSubmit")
+        // 修饰符·按键修饰符：@keydown="handleKeyDown" 等
+
+    </script>
+</body>
+</html>

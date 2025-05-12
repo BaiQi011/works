@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>vue3</title>
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+</head>
+<body>
+    <div id="app">
+        <input type="number" name="weight" v-model="weight" placeholder="请输入体重(kg)">
+        <input type="number" name="height" v-model="height" placeholder="请输入身高(m)">
+        <div>你的BMI是:{{bmi}}</div>
+    </div>
+    <script>
+        // 应用实例
+        const app = Vue.createApp({
+            data(){
+                return{
+                    weight:null,
+                    height:null,
+                }
+            },
+            computed: {
+                bmi(){
+                    console.log(this.weight,this.height);
+                    if (this.weight !== null && this.height !== null && this.height > 0) {
+                        return (this.weight / (this.height * this.height));
+                    } else {
+                        return null;
+                    }
+                }
+            }
+        })
+        const root = app.mount("#app") 
+        // 计算属性两种写法
+        // 计算属性特点：有缓存，一次监听（调用）
+        // 计算属性原理：watcher--观察者，dep--观察目标：依赖
+        // watch: {
+        //     weight(newValue,oldValue){
+        //         console.log(newValue,oldValue);
+        //     }
+        //     deep: true 若是对象内部属性,需要添加deep属性才能监听到值变化；或者只监听对象里的其中一个属性就能监听到。
+        // }
+    </script>
+</body>
+</html>

@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script src="https://cdn.jsdelivr.net/npm/jquery@3.7.1/dist/jquery.min.js"></script>
+  <title>简易待办事项列表</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: Arial, sans-serif;
+      line-height: 1.6;
+      margin: 0;
+      padding: 20px;
+      background-color: #f5f5f5;
+    }
+
+    .container {
+      max-width: 500px;
+      margin: 0 auto;
+      background-color: white;
+      padding: 20px;
+      border-radius: 5px;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    }
+
+    h1 {
+      text-align: center;
+      margin-bottom: 20px;
+      color: #333;
+    }
+
+    .todo-form {
+      display: flex;
+      margin-bottom: 20px;
+    }
+
+    #todo-input {
+      flex: 1;
+      padding: 10px;
+      border: 1px solid #ddd;
+      border-radius: 4px 0 0 4px;
+      font-size: 16px;
+    }
+
+    #add-button {
+      padding: 10px 15px;
+      background-color: #4caf50;
+      color: white;
+      border: none;
+      border-radius: 0 4px 4px 0;
+      cursor: pointer;
+      font-size: 16px;
+    }
+
+    #add-button:hover {
+      background-color: #45a049;
+    }
+
+    .todo-list {
+      list-style-type: none;
+    }
+
+    .todo-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px;
+      border-bottom: 1px solid #eee;
+    }
+
+    .todo-text {
+      flex: 1;
+      margin-left: 10px;
+    }
+
+    .completed {
+      text-decoration: line-through;
+      color: #888;
+    }
+
+    .delete-button {
+      background-color: #f44336;
+      color: white;
+      border: none;
+      padding: 5px 10px;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+
+    .delete-button:hover {
+      background-color: #d32f2f;
+    }
+
+    .todo-count {
+      text-align: center;
+      margin-top: 20px;
+      color: #666;
+    }
+
+    .clear-all-button {
+      display: block;
+      margin: 20px auto;
+      padding: 10px 20px;
+      background-color: #f44336;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 16px;
+    }
+
+    .clear-all-button:hover {
+      background-color: #d32f2f;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+    <h1>我的待办事项</h1>
+
+    <div class="todo-form">
+      <input type="text" id="todo-input" placeholder="添加新的待办事项...">
+      <button id="add-button">添加</button>
+    </div>
+
+    <ul class="todo-list" id="todo-list">
+      <!-- 待办事项将在这里动态添加 -->
+    </ul>
+
+    <div class="todo-count" id="todo-count">
+      当前有 <span id="count">0</span> 个待办事项
+    </div>
+
+    <button id="clear-all-button" class="clear-all-button">清空所有</button>
+  </div>
+
+  <script>
+    $(function () {
+        const $todoInput = $("#todo-input");
+        const $todoList = $("#todo-list");
+        const $addButton = $("#add-button");
+
+        if (!$todoInput.length || !$todoList.length || !$addButton.length) {
+            console.error("必要的 DOM 元素未找到，请检查页面结构");
+            return;
+        }
+
+        $addButton.on("click", function () {
+            // 获取输入值并去除首尾空格
+            const todoText = $todoInput.val().trim();
+
+            // 校验输入内容是否有效
+            if (!todoText) {
+                alert("请输入有效的待办事项内容！");
+                return;
+            }
+
+            // 创建删除按钮
+            const deleteButton = $("<button>")
+                .text("删除")
+                .addClass("delete-button")
+                .on("click", function () {
+                    $(this).closest("li").remove(); // 使用 closest 方法定位父级 <li>
+                    updateTodoCount();
+                });
+
+            // 创建待办事项文本
+            const spanText = $("<span>").text(todoText).addClass("todo-text");
+
+            // 创建列表项并追加到 #todo-list
+            const listItem = $("<li>").append(spanText, deleteButton);
+            $todoList.append(listItem);
+
+            // 清空输入框
+            $todoInput.val("");
+
+            // 更新待办事项计数
+            updateTodoCount();
+        });
+    });
+
+    // const todoList = document.querySelector('#todo-list');
+    // const todoInput = document.querySelector('#todo-input');
+    // const addButton = document.querySelector('#add-button');
+    // const clearAllButton = document.querySelector('#clear-all-button');
+
+    // 从 localStorage 加载待办事项
+    // function loadTodos() {
+    //   const todos = JSON.parse(localStorage.getItem('todos')) || [];
+    //   todos.forEach(todo => addTodoItem(todo));
+    //   updateTodoCount();
+    // }
+
+    // 添加待办事项
+    // function addTodo() {
+    //   const todoText = todoInput.value.trim();
+    //   if (todoText !== '') {
+    //     const todoItem = {
+    //       text: todoText,
+    //       completed: false
+    //     };
+    //     addTodoItem(todoItem);
+    //     saveTodos();
+    //     todoInput.value = '';
+    //   }
+    // }
+
+    // 添加待办事项到页面
+    // function addTodoItem(todoItem) {
+    //   const todoItemElement = document.createElement('li');
+    //   todoItemElement.classList.add('todo-item');
+
+    //   const checkbox = document.createElement('input');
+    //   checkbox.setAttribute('type', 'checkbox');
+    //   checkbox.checked = todoItem.completed;
+    //   checkbox.addEventListener('change', function() {
+    //     todoItem.completed = checkbox.checked;
+    //     span.classList.toggle('completed', checkbox.checked);
+    //     saveTodos();
+    //   });
+
+    //   const span = document.createElement('span');
+    //   span.classList.add('todo-text');
+    //   span.innerText = todoItem.text;
+    //   span.classList.toggle('completed', todoItem.completed);
+
+    //   const deleteButton = document.createElement('button');
+    //   deleteButton.classList.add('delete-button');
+    //   deleteButton.innerText = '删除';
+    //   deleteButton.addEventListener('click', function() {
+    //     todoItemElement.remove();
+    //     saveTodos();
+    //     updateTodoCount();
+    //   });
+
+    //   todoItemElement.appendChild(checkbox);
+    //   todoItemElement.appendChild(span);
+    //   todoItemElement.appendChild(deleteButton);
+    //   todoList.appendChild(todoItemElement);
+    // }
+
+    // 保存待办事项到 localStorage
+    // function saveTodos() {
+    //   const todos = Array.from(todoList.children).map(todoItemElement => {
+    //     const checkbox = todoItemElement.querySelector('input[type="checkbox"]');
+    //     const span = todoItemElement.querySelector('.todo-text');
+    //     return {
+    //       text: span.innerText,
+    //       completed: checkbox.checked
+    //     };
+    //   });
+    //   localStorage.setItem('todos', JSON.stringify(todos));
+    // }
+
+    // 更新待办事项数量
+    function updateTodoCount() {
+      // const countElement = document.getElementById('count');
+      // countElement.textContent = todoList.children.length;
+      $("#count").text(todoList.children.length)
+    }
+
+    // 清空所有待办事项
+    function clearAllTodos() {
+      todoList.innerHTML = '';
+      saveTodos();
+      updateTodoCount();
+    }
+
+    // 绑定事件
+    addButton.addEventListener('click', addTodo);
+    clearAllButton.addEventListener('click', clearAllTodos);
+
+    // 页面加载完成后加载待办事项
+    window.onload = loadTodos;
+  </script>
+</body>
+
+</html>

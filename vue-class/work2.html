@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Vue Navbar Example</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    /* 整体导航栏样式 */
+    #navbar {
+      color: rgb(240, 240, 240);
+      font-family: Arial, sans-serif;
+    }
+
+    /* 导航栏标题部分样式 */
+   .navbar-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      padding: 20px 150px;
+      background: #ffffff;
+    }
+
+    /* 导航栏标题右侧内容容器 */
+   .navbar-right {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+    }
+
+    /* 引导图标样式 */
+   .header-guide {
+      margin-bottom: 10px;
+    }
+
+   .header-guide img {
+      height: 20px;
+      vertical-align: middle;
+    }
+
+    /* 导航栏右侧链接样式 */
+   .navbar-links {
+      display: flex;
+      margin-bottom: 10px;
+    }
+
+   .navbar-links a {
+      color: #ff0000;
+      text-decoration: none;
+      padding: 0 10px;
+      border-right: 1px solid #ff0000;
+      font-size: 14px;
+    }
+
+   .navbar-links a:last-child {
+      border-right: none;
+    }
+
+    /* 搜索框样式 */
+   .search-box {
+      display: flex;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+
+    /* 搜索框输入框样式 */
+   .search-box input {
+      padding: 5px;
+      border: 1px solid #ddd;
+      border-radius: 3px 0 0 3px;
+    }
+
+    /* 搜索框按钮样式 */
+   .search-box button {
+      padding: 5px 10px;
+      background-color: #8b1313;
+      color: white;
+      border: none;
+      border-radius: 0 3px 3px 0;
+      cursor: pointer;
+      height: 30px;
+    }
+
+    /* 导航菜单样式 */
+   .navbar-menu {
+      background: #ff0000;
+    }
+
+    /* 导航菜单列表样式（去除列表小点） */
+   .navbar-menu-list {
+      display: flex;
+      justify-content: center;
+      margin: 0;
+      list-style: none;
+    }
+    .navbar-menu-item:hover  {
+      background: #d80202;
+    }
+    /* 导航菜单项样式 */
+    .navbar-menu-item {
+      position: relative;
+      box-sizing: border-box; /* 新增 */
+    }
+    /* 首页导航栏设置默认颜色 */
+    .navbar-menu-item:first-child {
+      background: #d80202;
+    }
+
+    /* 菜单链接样式 */
+   .navbar-menu a {
+      color: white;
+      text-decoration: none;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      transition: background 0.3s;
+    }
+    .navbar-menu-a {
+      font-size: 20px;
+      font-weight: bold;
+      padding: 0 30px;
+      margin: 30px 0;
+      border-right: 1px solid #ffffff;
+    }
+   .navbar-menu-a span {
+      font-size: 12px;
+      font-weight: none;
+    }
+
+    /* 下拉菜单样式 */
+    .dropdown-content {
+      display: none;
+      position: absolute;
+      top: 100%;
+      left: 0;
+      background: #ff0000;
+      width: 100%; 
+      list-style: none;
+      box-sizing: border-box;
+    }
+
+    /* 下拉菜单链接样式 */
+    .dropdown-content a {
+      color: white;
+      padding: 10px 0;
+      text-decoration: none;
+      display: block;
+      transition: background 0.3s;
+      text-align: center; /* 让文字居中显示占满宽度，可按需调整 */
+    }
+
+    /* 鼠标悬停下拉菜单显示内容 */
+   .navbar-menu-item:hover .dropdown-content {
+      display: block;
+    }
+
+    /* 下拉菜单项鼠标悬停效果 */
+   .dropdown-content a:hover {
+      background: #d80202;
+    }
+
+    /* 主菜单项悬停背景图片 */
+   .navbar-menu-item:hover a {
+      background-image: url('your-hover-image.jpg'); /* 替换为实际的图片路径 */
+      background-size: cover;
+    }
+  </style>
+</head>
+
+<body>
+  <div id="app"></div>
+  <!-- 229970507-封鉴纹 -->
+  <template id="root">
+    <div id="navbar">
+      <!-- 导航栏头部 -->
+      <div class="navbar-header">
+        <div class="navbar-title">
+          <img src="./img/hongyanlogo.png" alt="重庆红岩革命历史博物馆">
+        </div>
+        <div class="navbar-right">
+          <div class="header-guide">
+            <a href="#"><img src="./img/hongyan.png" alt="官方带你"></a>
+          </div>
+          <div class="navbar-links">
+            <a :href=item.url v-for="(item, index) in linkList" :key="item.name">{{ item.name }}</a>
+          </div>
+          <div class="search-box">
+            <input type="text" placeholder="请输入搜索关键词">
+            <button>搜索</button>
+          </div>
+        </div>
+      </div>
+      <!-- 导航菜单 -->
+      <div class="navbar-menu">
+        <ul class="navbar-menu-list">
+          <li v-for="(item, index) in navList" :key="item.name" class="navbar-menu-item dropdown">
+            <a :href="item.url" class="navbar-menu-a">{{ item.name }}<span>{{ item.eng }}</span></a>
+            <ul v-if="item.children" class="dropdown-content">
+              <li v-for="(i, index) in item.children" :key="i.name">
+                <a :href="i.url">{{ i.name }}</a>
+              </li>
+            </ul>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </template>
+  <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+  <script>
+    Vue.createApp({
+      template: "#root",
+      data() {
+        return {
+          navList: [
+            { name: "首页", eng: "Home", url: "#" },
+            {
+              name: "关于红岩", eng: "HongYan", url: "#",
+              children: [
+                { name: "红岩文化", url: "#" },
+                { name: "博物馆机构", url: "#" },
+                { name: "历史沿革", url: "#" }
+              ]
+            },
+            {
+              name: "公告动态", eng: "Dynamics", url: "#",
+              children: [
+                { name: "文博信息", url: "#" },
+                { name: "政务平台", url: "#" },
+                { name: "公告", url: "#" },
+                { name: "专题报道", url: "#" }
+              ]
+            },
+            { name: "馆藏精品", eng: "Collections", url: "#",
+              children: [
+                { name: "一级文物", url: "#" },
+                { name: "二级文物", url: "#" },
+                { name: "三级文物", url: "#" }
+              ]
+            },
+            { name: "陈列展览", eng: "Exhibition", url: "#",
+              children: [
+                { name: "虚拟展览", url: "#" },
+                { name: "基本成列", url: "#" },
+                { name: "复原成列", url: "#" },
+                { name: "临时展览", url: "#" },
+                { name: "展览交流", url: "#" }
+              ]
+            },
+            { name: "研究开发", eng: "Research", url: "#",
+              children: [
+                { name: "历史研究", url: "#" },
+                { name: "艺术创作", url: "#" },
+                { name: "影音在线", url: "#" },
+                { name: "文创产品", url: "#" }
+              ]
+            },
+            { name: "公共教育", eng: "Education", url: "#",
+              children: [
+                { name: "党性教育", url: "#" },
+                { name: "爱国主义教育", url: "#" },
+                { name: "研学实践教育", url: "#" },
+                { name: "科普教育", url: "#" }
+              ]
+            },
+            { name: "参观服务", eng: "Service", url: "#",
+              children: [
+                { name: "景点介绍", url: "#" },
+                { name: "景区登记", url: "#" },
+                { name: "志愿服务", url: "#" },
+                { name: "服务内容", url: "#" }
+              ]
+            },
+            { name: "景区登记", eng: "Reservation", url: "#" }
+          ],
+          linkList: [
+            { name: "设为首页", url: "#" },
+            { name: "加入收藏", url: "#" },
+            { name: "热线：023 - 65312300（沙坪坝片区）023 - 63303457（渝中片区）", url: "#" },
+            { name: "English", url: "#" }
+          ]
+        };
+      },
+      methods: {
+        handleMenuItemClick(item) {
+          if (item.url) {
+            window.location.href = item.url;
+          }
+        }
+      }
+    }).mount('#app');
+  </script>
+</body>
+
+</html>

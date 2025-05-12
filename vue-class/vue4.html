@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>vue4</title>
+  <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+  <style>
+    table {
+      border-collapse: collapse;
+    }
+
+    th, td {
+      border: 1px solid black;
+      padding: 10px 20px;
+    }
+    /* 成绩小于60的颜色为红色 */
+    td.low-score {
+      color: red;
+    }
+    /* 隔行变色 */
+    .tr-color {
+      background-color: #f0f0f0;
+    }
+  </style>
+
+</head>
+
+<body>
+  <div id="app"></div>
+  <template id="root">
+    <table>
+      <thead> <!-- 表头部分 -->
+        <tr>
+          <th>学号</th>
+          <th>姓名</th>
+          <th>年龄</th>
+          <th>性别</th>
+          <th>成绩</th>
+        </tr>
+      </thead>
+      <tbody> <!-- 表格主体部分 -->
+        <tr v-for="(item, index) in list" :key="item.name" :class="(index%2) == 0 ? 'tr-color' : ''"> 
+          <td>{{ index+1 }}</td>
+          <td>{{ item.name }}</td>
+          <td>{{ item.age }}</td>
+          <td>{{ item.sex }}</td>
+          <td :class="{'low-score': item.grade < 60}">{{ item.grade }}</td>
+        </tr>
+      </tbody>
+    </table>
+  </template>
+  <script>
+    const { createApp } = Vue;
+    const app = createApp({
+      template: '#root',
+      data() {
+        return {
+          list: [
+            { name: '张三', age: 18, sex: '男', grade: 68 },
+            { name: '李四', age: 19, sex: '女', grade: 89 },
+            { name: '王五', age: 20, sex: '男', grade: 100 },
+            { name: '赵六', age: 21, sex: '女', grade: 99 },
+            { name: '孙七', age: 22, sex: '男', grade: 55 },
+          ],
+        };
+      }
+    });
+    // 挂载到 #app 元素
+    app.mount("#app");
+  </script>
+</body>
+
+</html>

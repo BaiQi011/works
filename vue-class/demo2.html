@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>demo2</title>
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+</head>
+<body>
+    <div id="app"></div>
+    <template id="root">
+        <div class="list">
+            <h1>任务列表</h1>
+            <ul>
+                <li v-for="(item,index) in list" :key="index" @dblclick="updateList(index, $event)">{{item}}</li>
+            </ul>
+        </div>
+    </template>
+    <script>
+        Vue.createApp({
+            template: '#root',
+            data() {
+                return {
+                    list:[
+                        '吃饭',
+                        '睡觉',
+                        '打代码'
+                    ]
+                };
+            },
+            methods: {
+                updateList(index, e){
+                    const inputContent = document.createElement('input');
+                    inputContent.value = e.target.innerHTML; 
+                    e.target.innerHTML = ''; 
+                    e.target.appendChild(inputContent); 
+                    inputContent.focus(); 
+                    ///监听回车键
+                    inputContent.addEventListener('keyup', (event) => {
+                        if (event.key === 'Enter') {
+                            this.list[index] = inputContent.value;
+                            e.target.innerHTML = inputContent.value;
+                        }
+                    });
+                }
+            }
+        }).mount("#app") 
+    </script>
+</body>
+</html>
+    

@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>demo1</title>
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <style>
+        .ad1{
+            display: flex;
+            justify-content: center;
+            flex-direction: column;
+            align-items: center;
+            top: auto 0;
+            left: auto 0;
+            width: 360px;
+            height: 600px;
+            background-color: rgba(106, 106, 106, 0.5);
+        }
+        .ad1 img{
+            width: 90%;
+            height: 90%;
+        }
+        .closebtn{
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            padding-left: 330px;
+        }
+
+    </style>
+</head>
+<body>
+    <div id="root">
+        <div class="ad1">
+            <div class="closebtn" @click="closeAd">
+                <img src="../cross.png" alt="close"></img>
+            </div>
+            <img src="../ad.png" alt="ad">
+        </div>
+    </div>
+    <script>
+        // 应用实例
+        Vue.createApp({
+            methods:{
+                closeAd(){
+                    document.querySelector(".ad1").style.display = "none";
+                }
+            },
+        }).mount("#root") 
+    </script>
+</body>
+</html>

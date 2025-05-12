@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>class6</title>
+    <style>
+        #div1{
+            width: 100px;
+            height: 100px;
+            background-color: rgb(255, 206, 206);
+            text-align: center;
+            line-height: 50px;
+        }
+
+    </style>
+</head>
+<body>
+    <div>
+        <input type="text">
+        <button id="btn">提交</button>
+    </div>
+    <div id="div1">这是广告3秒后关闭</div>
+    <script>
+        window.onload = function(){
+            const btn = document.getElementById('btn');
+            let count = 10
+            btn.addEventListener('click',function(){
+                let timeId = setInterval(function(){
+                    if(count == 0){
+                        clearInterval(timeId);
+                    }else{
+                        btn.innerHTML = "还剩"+count;
+                        count--
+                    }    
+                },1000)
+            })
+
+            const div1 = document.getElementById('div1');
+            setTimeout(function(){
+                div1.style.display = 'none';
+            },3000)
+        }
+
+        window.onload('scroll', function(){
+            console.log('页面滚动了'+window.scrollY+'像素');
+            
+        })
+
+        // window => location:href,reload,hash,search,host,hostname,port,protocol
+        // window => history:forward(前进),back（返回）,go
+
+        // document.refferrer:针对线上服务，文件服务，不是本地服务，统计流量渠道，是从那个网页跳转的
+        
+        // 字符串转换为对象：JSON.parse(str)
+    </script>
+</body>
+</html>

@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>jQuery Easing Plugin Demo</title>
+    <script src="https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/jquery.easing@1.4.1/jquery.easing.min.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+        
+        .box {
+            width: 100px;
+            height: 100px;
+            background-color: #4CAF50;
+            margin: 20px auto;
+            position: relative;
+            left: 0;
+        }
+        
+        .easing-options {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 20px;
+        }
+        
+        button {
+            padding: 8px 12px;
+            background-color: #2196F3;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        
+        button:hover {
+            background-color: #0b7dda;
+        }
+        
+        .current-easing {
+            margin-top: 20px;
+            text-align: center;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <!-- 229970507-封鉴纹纹 -->
+    <div class="container">
+        <h1>jQuery Easing Plugin Demo</h1>
+        <div class="box" id="animatedBox"></div>
+        <div class="easing-options">
+            <!-- 线性缓动，速度恒定 -->
+            <button data-easing="linear">Linear</button>
+            <!-- 摆动缓动，先加速后减速 -->
+            <button data-easing="swing">Swing</button>
+            <!-- 二次方的缓入 -->
+            <button data-easing="easeInQuad">easeInQuad</button>
+            <!-- 二次方的缓出 -->
+            <button data-easing="easeOutQuad">easeOutQuad</button>
+            <!-- 指数曲线的缓出 -->
+            <button data-easing="easeOutExpo">easeOutExpo</button>
+        </div>
+        
+        <div class="current-easing" id="currentEasing">当前缓动效果: linear</div>
+    </div>
+
+    <script>
+        $(document).ready(function() {
+    // 获取动画盒子元素
+    const $box = $('#animatedBox');
+    // 初始化当前缓动效果为 'linear'
+    let currentEasing = 'linear';
+    
+    // 调用函数初始化动画
+    animateBox();
+    
+    // 为所有按钮绑定点击事件
+    $('button').click(function() {
+        // 获取按钮上 data-easing 属性的值，即缓动效果名称
+        const easing = $(this).data('easing');
+        // 更新当前缓动效果
+        currentEasing = easing;
+        // 更新页面上显示的当前缓动效果
+        $('#currentEasing').text(`当前缓动效果: ${easing}`);
+        // 重新启动动画，应用新的缓动效果
+        animateBox();
+    });
+    
+    // 定义动画函数
+    function animateBox() {
+        // 动画盒子向右移动到 650px 位置，使用当前缓动效果，持续 3 秒
+        $box.animate({ left: '650px' }, 3000, currentEasing, function() {
+            // 动画完成后，动画盒子返回初始位置，使用相同的缓动效果，持续 3 秒
+            // 动画完成后递归调用 animateBox 函数，实现循环动画
+            $box.animate({ left: '0px' }, 3000, currentEasing, animateBox);
+        });
+    }
+});
+    </script>
+</body>
+</html>

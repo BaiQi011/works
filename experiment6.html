@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>实验6</title>
+</head>
+<body>
+    <!-- 229970507-封鉴纹 -->
+    <script>
+        // 模拟 Promise 构造函数
+        function MyPromise(executor) {
+        // 三种状态：pending、resolved、rejected，初始状态为 pending
+        this.state = 'pending';
+        // 保存成功的值
+        this.value = undefined;
+        // 保存失败的原因
+        this.reason = undefined;
+        // 成功回调函数队列
+        this.onResolvedCallbacks = [];
+        // 失败回调函数队列
+        this.onRejectedCallbacks = [];
+
+        // resolve 函数，用于将 Promise 状态改为 resolved
+        const resolve = (value) => {
+            // 如果状态不是 pending，直接返回，状态不可逆
+            if (this.state !== 'pending') {
+                return;
+            }
+            // 修改状态为 resolved
+            this.state = 'resolved';
+            // 保存成功值
+            this.value = value;
+            // 执行所有成功回调
+            this.onResolvedCallbacks.forEach(callback => {
+                callback(value);
+            });
+        };
+
+        // reject 函数，用于将 Promise 状态改为 rejected
+        const reject = (reason) => {
+            // 如果状态不是 pending，直接返回，状态不可逆
+            if (this.state !== 'pending') {
+                return;
+            }
+            // 修改状态为 rejected
+            this.state = 'rejected';
+            // 保存失败原因
+            this.reason = reason;
+            // 执行所有失败回调
+            this.onRejectedCallbacks.forEach(callback => {
+                callback(reason);
+            });
+        };
+
+        // 执行 executor 函数
+        try {
+            executor(resolve, reject);
+        } catch (error) {
+            // 如果 executor 函数执行出错，调用 reject
+            reject(error);
+        }
+        }
+
+        // then 方法
+        MyPromise.prototype.then = function(onFulfilled, onRejected) {
+        // 判断回调类型，不是函数则忽略
+        onFulfilled = typeof onFulfilled === 'function' ? onFulfilled : value => value;
+        onRejected = typeof onRejected === 'function' ?
+            onRejected :
+            reason => {
+            throw reason;
+            };
+
+        // 创建一个新的 Promise
+        let promise2 = new MyPromise((resolve, reject) => {
+            // 如果当前 Promise 状态是 resolved，执行成功回调
+            if (this.state === 'resolved') {
+            try {
+                // 执行回调
+                let x = onFulfilled(this.value);
+                // 如果回调返回的是 MyPromise，等待其状态改变
+                if (x instanceof MyPromise) {
+                x.then(resolve, reject);
+                } else {
+                // 否则直接 resolve 新的 Promise
+                resolve(x);
+                }
+            } catch (error) {
+                // 如果回调执行出错，拒绝新的 Promise
+                reject(error);
+            }
+            }
+            // 如果当前 Promise 状态是 rejected，执行失败回调
+            else if (this.state === 'rejected') {
+                try {
+                    // 执行回调
+                    let x = onRejected(this.reason);
+                    // 如果回调返回的是 MyPromise，等待其状态改变
+                    if (x instanceof MyPromise) {
+                        x.then(resolve, reject);
+                    } else {
+                        // 否则直接 resolve 新的 Promise
+                        resolve(x);
+                    }
+                } catch (error) {
+                    // 如果回调执行出错，拒绝新的 Promise
+                    reject(error);
+                }
+            }
+            // 如果当前 Promise 状态是 pending，将回调函数存入队列
+            else {
+                this.onResolvedCallbacks.push(() => {
+                    try {
+                        // 执行回调
+                        let x = onFulfilled(this.value);
+                        // 如果回调返回的是 MyPromise，等待其状态改变
+                        if (x instanceof MyPromise) {
+                            x.then(resolve, reject);
+                        } else {
+                            // 否则直接 resolve 新的 Promise
+                            resolve(x);
+                        }
+                    } catch (error) {
+                        // 如果回调执行出错，拒绝新的 Promise
+                        reject(error);
+                    }
+                });
+                this.onRejectedCallbacks.push(() => {
+                    try {
+                        // 执行回调
+                        let x = onRejected(this.reason);
+                        // 如果回调返回的是 MyPromise，等待其状态改变
+                        if (x instanceof MyPromise) {
+                            x.then(resolve, reject);
+                        } else {
+                            // 否则直接 resolve 新的 Promise
+                            resolve(x);
+                        }
+                    } catch (error) {
+                        // 如果回调执行出错，拒绝新的 Promise
+                        reject(error);
+                    }
+                });
+            }
+        });
+
+        // 返回新的 Promise，支持链式调用
+        return promise2;
+        };
+
+        // 测试代码
+        let p = new MyPromise((resolve, reject) => {
+            // 模拟异步操作
+            setTimeout(() => {
+                // resolve('成功');
+                reject('失败');
+            }, 1000);
+        });
+        p.then(
+            (value) => {
+                console.log('成功回调:', value);
+                return new MyPromise((resolve) => {
+                resolve('新的成功值');
+                });
+            },
+            (reason) => {
+                console.log('失败回调:', reason);
+                return new MyPromise((resolve) => {
+                resolve('新的失败处理');
+                });
+            }
+        ).then(
+            (value) => {
+                console.log('第二个成功回调:', value);
+            },
+            (reason) => {
+                console.log('第二个失败回调:', reason);
+            }
+        );
+    </script>
+</body>
+</html>

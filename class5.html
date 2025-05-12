@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>事件</title>
+</head>
+<body>
+    <div id="d1">
+        <div id="d2">
+            <button id="btn">按钮</button>
+        </div>
+    </div>
+    <input type="text" id="keyword" placeholder="请输入关键字" />
+    <button id="btn2">提交</button>
+    <script>
+        window.onload = function(){
+            const d1 = document.querySelector('#d1');
+            const d2 = document.getElementById('d2');
+            const btn = document.getElementById('btn');
+            // 事件流：事件冒泡，由内向外直到外层节点
+            btn.addEventListener('click',function(){
+                console.log('按钮被点击了');
+            })
+            d1.addEventListener('click',function(){
+                console.log('d1被点击了');
+            },true) // 第三个参数useCapture 为true时，事件流为捕获，从外向内
+            d2.addEventListener('click',function(){
+                console.log('d2被点击了');
+            })
+        }
+        // stopPropagation() 阻止事件冒泡,冒泡事件向上
+        // preventDefault() 阻止默认事件
+
+        const keyword = document.getElementById('keyword');
+        const btn2 = document.getElementById('btn2');
+        // dom2 事件绑定
+        btn2.addEventListener('click',function(){
+            if(keyword.value === '')
+                alert('请输入关键字');
+            else
+                alert('关键字为：'+keyword.value);
+        })
+        // dom1 事件绑定
+        // btn2.onclick = function(){
+        //     if(keyword.value === '')
+        //         alert('请输入关键字');
+        //     else
+        //         alert('关键字为：'+keyword.value);
+        // }
+    </script>
+</body>
+</html>

@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>顶部横幅广告</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      height: 200vh;
+    }
+
+    #banner-ad {
+      position: fixed;
+      top: -100px;
+      left: 0;
+      width: 100%;
+      height: 100px;
+      background-color: #ffcc00;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+      z-index: 1000;
+      transition: top 0.5s ease; 
+      /* 显示动画 */
+    }
+
+    #banner-ad.show {
+      top: 0;
+    }
+
+    #banner-ad .close-btn {
+      position: absolute;
+      right: 10px;
+      top: 10px;
+      background-color: #ff0000;
+      color: #fff;
+      border: none;
+      border-radius: 50%;
+      width: 20px;
+      height: 20px;
+      font-size: 14px;
+      cursor: pointer;
+    }
+  </style>
+</head>
+
+<body>
+  <script>
+    // 创建广告
+    const bannerAd = document.createElement('div');
+    bannerAd.id = 'banner-ad';
+
+    // 创建广告内容
+    const adContent = document.createElement('span');
+    adContent.textContent = '这是一个广告';
+
+    // 创建关闭按钮
+    const closeButton = document.createElement('button');
+    closeButton.className = 'close-btn';
+    closeButton.textContent = 'X';
+    closeButton.onclick = function() {
+      bannerAd.classList.remove('show');
+    };
+
+    // 将广告内容和关闭按钮添加到广告容器中
+    bannerAd.appendChild(adContent);
+    bannerAd.appendChild(closeButton);
+
+    // 将广告容器添加到body中
+    document.body.appendChild(bannerAd);
+
+    // 页面加载完成后显示广告
+    window.onload = function() {
+      bannerAd.classList.add('show');
+    };
+  </script>
+</body>
+
+</html>

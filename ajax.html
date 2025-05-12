@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ajax</title>
+    <!-- 引入jQuery库 -->
+    <script src="https://cdn.jsdelivr.net/npm/jquery@3.7.1/dist/jquery.min.js"></script>
+</head>
+<body>
+    <div class="button" style="background-color: aqua; width: 100px; height: 50px;">开始异步请求</div><br>
+    <div class="button2" style="background-color: aqua; width: 100px; height: 50px;">jquery_ajax</div>
+    <script>
+        var url = "http://jsonplaceholder.typicode.com/posts/1";
+        method = "GET";
+        const button = document.querySelector(".button");
+        button.addEventListener("click",function(){
+            ajax(url,method,null,function(data){
+                console.log(data);
+            })
+        })
+        function ajax(url,method,data,callback){
+            // 创建ajax对象
+            var xhr = new XMLHttpRequest();
+            // 设置请求
+            xhr.open(method,url,true);
+            
+            // 监听请求
+            xhr.onload = function(){
+                if(xhr.status == 200){
+                    console.log(JSON.parse(xhr.responseText));
+                    callback(xhr.responseText);
+                }
+            }
+            // 发送请求
+            xhr.send(data);
+        }
+
+        $(".button2").click(function(){
+            $.ajax({
+                url:"http://jsonplaceholder.typicode.com/posts/1",
+                type:"GET",
+                success:function(data){
+                    console.log(data);
+                }
+            })
+        })
+
+        const age = 50;
+        const p = new Promise(function (resolve, reject) {
+            if(age > 30){
+                setTimeout(() => {
+                    resolve("老了");
+                }, 3000);
+            }else{
+                reject("还没老");
+            }
+        })
+        p.then(function(data){
+            console.log(data);
+        }).catch(function(data){
+            console.log(data);
+        }).finally(function(){
+            console.log("终于完了");
+        })
+
+        fetch("http://jsonplaceholder.typicode.com/todos/1")
+        .then(response => {
+            // 检查响应状态是否为200 - 299
+            if(!response.ok) {
+                throw new Error(`HTTP error! Status: ${response.status}`);
+            }
+            // 将响应数据解析为JSON
+            return response.json();
+        })
+        .then(data => {
+            console.log(data);
+        })
+        .catch(error => {
+            console.error('Fetch error:', error);
+        });
+
+        // promise的四个方法：then、catch、finally、all
+        // promise的四个静态方法：resolve、reject、all、race
+        // generator生成器函数，本质是个函数，返回一个生成器
+        function* gen(){
+            yield 'hello';
+            yield 'world';
+            return 'ending';
+        }
+        var g = gen(); //生成器
+
+        function* generator(i) {
+            yield i;
+            yield i+10
+        }
+        const gen = generator(10); // gen就是生成器generator
+        console.log(gen.next().value); // { value: 10, done: false }
+        console.log(gen.next().value); // { value: 20, done: false }
+        console.log(gen.next().value); // { value: undefined, done: true }
+    </script>
+</body>
+</html>

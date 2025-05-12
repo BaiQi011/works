@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <script src="https://cdn.jsdelivr.net/npm/jquery@3.7.1/dist/jquery.min.js"></script>
+</head> 
+<body>
+    <div id="t1" class="div1">这是jQuery</div>
+    <div id="div2">
+        <p>123</p>
+    </div>
+
+    <p id="p">动画</p>
+    <script>
+        // // 写法一
+        // $(document).ready(function(){
+
+        // })
+        // // 写法二：$就是jquery
+        // $(function(){
+        //     const node = document.querySelector("#t1")
+        //     console.log(t1)
+        //     log($("#t1"))
+        //     // 
+        //     console.log($("#t1")[0])
+        // })
+
+        $(function(){
+            const t1 = $("#t1")
+            t1.css("color","red")
+        })
+
+        const element = $("#div2")
+        element.append("<p>456</p>")
+        element.appendTo("<p>789</p>") // 被动
+        element.after("<b>123</b>")
+        element.before("<i>456</i>")
+
+        element.wrap("<div></div>")
+        element.unwrap()
+        element.wrapAll("<b></b>")//b包住所有的element标签
+        element.wrapInner("<div></div>")
+
+        element.replaceAll("div")
+        element.replaceWith("<div></div>") // 被动
+
+        // trigger() 触发 主动
+        // element.trigger("click")
+
+
+        // 内置动画
+        $(function(){
+            $('#p').hide(3000,function(){
+                console.log("动画隐藏")
+            }).show(1000)
+        })
+        // 淡入：fadeIn
+        // 淡出：fadeOut
+        // fadeTo：淡入淡出
+        // 放大：scaleIn
+        // 缩小：scaleOut
+        // 旋转：rotateIn
+        // 旋转：rotateOut
+        // 翻转：flipInX
+        // 翻转：flipOutX
+        // 翻转：flipInY
+        // 翻转：flipOutY
+    </script> 
+</body>
+</html>

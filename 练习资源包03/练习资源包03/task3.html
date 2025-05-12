@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8" />
+		<title>让坦克开起来</title>
+		<style type="text/css">
+			input{font-size:26px;margin-top: 20px;}
+			body{background-image: url(images/grassland.png);}
+			#mytank{position: absolute;left:10px;top:100px}
+		</style>
+	</head>
+	<body>		
+		<img id="mytank" src="images/right.png"/>
+		<script>
+			// 229970507-封鉴纹
+			// 获取浏览器窗口宽度
+			const windowWidth = window.innerWidth;
+			// 获取浏览器窗口高度
+			const windowHeight = window.innerHeight;
+			console.log(`浏览器窗口宽度: ${windowWidth}px`);
+			console.log(`浏览器窗口高度: ${windowHeight}px`);
+
+			// 编写代码，让坦克能上下左右移动
+			const mytank = document.getElementById("mytank");
+			// 获取图片的宽度
+			const imgWidth = mytank.width;
+			// 获取图片的高度
+			const imgHeight = mytank.height;
+
+			document.addEventListener("contextmenu", function (e) {
+			e.preventDefault(); // 阻止默认事件-浏览器右键菜单
+			});
+			
+			// 键盘事件
+			document.addEventListener("keydown", function(e){
+				const key = e.keyCode;
+				console.log(key);
+				switch(key){
+					case 65: // 左
+					    if(mytank.offsetLeft <= 0)
+							return;
+						mytank.style.left = mytank.offsetLeft - 10 + "px";
+						break;
+					case 87: // 上
+						if(mytank.offsetTop <= 0)
+							return;
+						mytank.style.top = mytank.offsetTop - 10 + "px";
+						break;
+					case 68: // 右
+						if(mytank.offsetLeft > windowWidth)
+							return;
+						mytank.style.left = mytank.offsetLeft + 10 + "px";
+						break;
+					case 83: // 下
+						if(mytank.offsetTop > windowHeight)
+							return;
+						mytank.style.top = mytank.offsetTop + 10 + "px";
+						break;
+				}
+			})
+		</script>
+	</body>
+</html>

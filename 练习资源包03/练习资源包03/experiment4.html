@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>实验4</title>
+    <style>
+        body {
+            min-height: 300vh;
+            margin: 0;
+        }
+
+        /* 对联广告容器 */
+        .couplet-ad {
+            position: fixed;
+            top: 20%;
+            opacity: 0;
+            transform: translateY(-10px);
+            transition: all 0.5s ease-out;
+            z-index: 1000;
+            width: 120px;  /* 新增容器尺寸 */
+            height: 300px; /* 匹配广告图片尺寸 */
+        }
+
+        .couplet-ad.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        #ad1 {
+            left: 20px;
+        }
+
+        #ad2 {
+            right: 20px;
+        }
+
+        /* 右下角广告容器 */
+        #ad3 {
+            position: fixed;
+            bottom: -100px;
+            right: 20px;
+            opacity: 0;
+            transition: all 0.5s ease-out;
+            z-index: 1000;
+            width: 300px;  /* 新增容器尺寸 */
+            height: 200px; /* 匹配广告图片尺寸 */
+        }
+
+        #ad3.show {
+            bottom: 10px;
+            opacity: 1;
+        }
+
+        /* 关闭按钮样式 */
+        .close-btn {
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            width: 58px;
+            height: 20px;
+            cursor: pointer;
+            z-index: 1001;
+            transition: opacity 0.2s;
+        }
+
+        .close-btn:hover {
+            opacity: 0.8;
+        }
+
+        /* 广告图片绝对定位 */
+        .couplet-ad img:not(.close-btn),
+        #ad3 img:not(.close-btn) {
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 100%;    /* 继承容器宽度 */
+            height: 100%;   /* 继承容器高度 */
+            object-fit: cover; /* 保持图片比例 */
+        }
+
+        #textContent {
+            width: 80%;
+            margin: 20px auto;
+            padding: 20px;
+            background-color: #e7e7e7;
+        }
+
+        /* 内容部分 */
+        .course-section {
+            margin: 40px 0;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .course-content h3 {
+            color: #2c3e50;
+            border-bottom: 2px solid #3498db;
+            padding-bottom: 5px;
+            margin: 25px 0 15px;
+        }
+
+        pre {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 6px;
+            overflow-x: auto;
+        }
+
+        code {
+            font-family: 'Fira Code', Consolas, monospace;
+            font-size: 0.9em;
+        }
+
+        .optimization-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 15px 0;
+        }
+
+        .optimization-table th,
+        .optimization-table td {
+            padding: 12px;
+            border: 1px solid #ddd;
+            text-align: left;
+        }
+
+        .optimization-table th {
+            background-color: #3498db;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <!-- <div id="textContent">
+        <h1>页面主要内容</h1>
+        <p>请向下滚动查看广告效果...</p> -->
+    </div>
+    <div id="textContent">
+        <h1>客户端开发技术课程大纲</h1>
+        <p>《现代Web前端开发》课程内容 - 向下滚动查看完整课程信息...</p>
+    
+        <section class="course-section">
+            <h2>第一章：HTML5 核心</h2>
+            <div class="course-content">
+                <h3>1.1 语义化标签</h3>
+                <ul>
+                    <li>文档结构标签：header, nav, article, section, footer</li>
+                    <li>多媒体标签：video, audio, canvas</li>
+                    <li>表单增强：input类型(date, email, range), datalist</li>
+                </ul>
+                
+                <h3>1.2 DOM API</h3>
+                <pre><code class="language-javascript">
+    // 元素选择示例
+    const header = document.querySelector('header');
+    header.classList.add('main-header');
+    
+    // 事件监听示例
+    document.getElementById('myButton').addEventListener('click', () => {
+        console.log('Button clicked!');
+    });
+                </code></pre>
+            </div>
+        </section>
+    
+        <section class="course-section">
+            <h2>第二章：CSS3 高级特性</h2>
+            <div class="course-content">
+                <h3>2.1 现代布局技术</h3>
+                <ul>
+                    <li>Flexbox布局：flex容器与项目属性</li>
+                    <li>Grid布局：网格模板与轨道定义</li>
+                    <li>响应式设计：媒体查询与视口单位</li>
+                </ul>
+    
+                <h3>2.2 动画与过渡</h3>
+                <pre><code class="language-css">
+    /* 关键帧动画示例 */
+    @keyframes slidein {
+        from { transform: translateX(-100%); }
+        to { transform: translateX(0); }
+    }
+    
+    .slide-element {
+        animation: slidein 0.3s ease-out;
+        transition: transform 0.2s;
+    }
+                </code></pre>
+            </div>
+        </section>
+    
+        <section class="course-section">
+            <h2>第三章：JavaScript 高级编程</h2>
+            <div class="course-content">
+                <h3>3.1 ES6+ 特性</h3>
+                <ul>
+                    <li>箭头函数与this绑定</li>
+                    <li>Promise与async/await</li>
+                    <li>模块化开发（import/export）</li>
+                </ul>
+    
+                <h3>3.2 现代前端框架</h3>
+                <div class="framework-example">
+                    <h4>React 组件示例：</h4>
+                    <pre><code class="language-jsx">
+    function Counter() {
+        const [count, setCount] = useState(0);
+    
+        return (
+            &lt;div&gt;
+                &lt;p&gt;Count: {count}&lt;/p&gt;
+                &lt;button onClick={() => setCount(c => c+1)}&gt;
+                    Increment
+                &lt;/button&gt;
+            &lt;/div&gt;
+        );
+    }
+                    </code></pre>
+                </div>
+            </div>
+        </section>
+    
+        <section class="course-section">
+            <h2>第四章：工程化实践</h2>
+            <div class="course-content">
+                <h3>4.1 构建工具链</h3>
+                <ul>
+                    <li>Webpack配置与loader使用</li>
+                    <li>Babel转译与polyfill</li>
+                    <li>代码规范：ESLint + Prettier</li>
+                </ul>
+    
+                <h3>4.2 性能优化</h3>
+                <table class="optimization-table">
+                    <tr>
+                        <th>技术</th>
+                        <th>实现方式</th>
+                        <th>效果</th>
+                    </tr>
+                    <tr>
+                        <td>代码分割</td>
+                        <td>动态import()</td>
+                        <td>减少首屏加载体积</td>
+                    </tr>
+                    <tr>
+                        <td>图片优化</td>
+                        <td>WebP格式 + 懒加载</td>
+                        <td>降低网络负载</td>
+                    </tr>
+                </table>
+            </div>
+        </section>
+    </div>
+    <!-- 左侧对联广告 -->
+    <div id="ad1" class="couplet-ad">
+        <img src="./images/close.png" class="close-btn" id="close1">
+        <img src="./images/ad1.jpg">
+    </div>
+
+    <!-- 右侧对联广告 -->
+    <div id="ad2" class="couplet-ad">
+        <img src="./images/close.png" class="close-btn" id="close2">
+        <img src="./images/ad1.jpg">
+    </div>
+
+    <!-- 右下角弹窗广告 -->
+    <div id="ad3">
+        <img src="./images/close.png" class="close-btn" id="close3">
+        <img src="./images/ad2.jpg">
+    </div>
+
+    <script>
+        (function() {
+        // 广告配置参数
+        const config = {
+            showDelay: 100,      // 缩短显示延迟
+            scrollThreshold: 100 // 滚动触发阈值(px)
+        };
+        // 初始化广告
+        function initAds() {
+            const ads = {
+                ad1: document.querySelector('#ad1'),
+                ad2: document.querySelector('#ad2'),
+                ad3: document.querySelector('#ad3')
+            };
+            let adsShown = false;
+            // 显示广告逻辑
+            function showAds() {
+                if (adsShown) return;
+                adsShown = true;
+                
+                Object.values(ads).forEach(ad => {
+                    ad.classList.add('show');
+                });
+                
+                // 移除滚动监听
+                window.removeEventListener('scroll', scrollHandler);
+            }
+            // 滚动处理函数
+            function scrollHandler() {
+                if (window.pageYOffset > config.scrollThreshold) {
+                    showAds();
+                }
+            }
+            // 关闭事件处理
+            function bindCloseEvents() {
+                document.querySelector('#close1').addEventListener('click', () => 
+                    ads.ad1.classList.remove('show'));
+                document.querySelector('#close2').addEventListener('click', () => 
+                    ads.ad2.classList.remove('show'));
+                document.querySelector('#close3').addEventListener('click', () => 
+                    ads.ad3.classList.remove('show'));
+            }
+            // 窗口大小变化处理
+            function handleResize() {
+                ads.ad1.style.top = `${window.innerHeight * 0.2}px`;
+                ads.ad2.style.top = `${window.innerHeight * 0.2}px`;
+            }
+            // 事件监听
+            window.addEventListener('scroll', scrollHandler);
+            window.addEventListener('resize', handleResize);
+            bindCloseEvents();
+            handleResize();
+
+            setTimeout(showAds, 10000);
+        }
+        document.addEventListener('DOMContentLoaded', initAds);
+    })();
+    </script>
+</body>
+</html>

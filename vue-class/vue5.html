@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>用户注册</title>
+  <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+  <style>
+   .form-group label.success {
+      color: green;
+    }
+  </style>
+</head>
+
+<body>
+  <div id="app"></div>
+  <template id="root">
+    <!-- 用户注册  页面 -->
+    <div class="regist">
+      <h1>用户注册</h1>
+      <form @submit.prevent="handleRegister">
+        <div class="form-group">
+          <label for="">用户名</label>
+          <input type="text" placeholder="请输入用户名" v-model="user.name" @input="checkUserName">
+          <label :class="{success: isUserNameValid}" for="">校验通过</label>
+        </div>
+        <div class="form-group">
+          <label for="">密码</label>
+          <input type="password" placeholder="请输入密码" v-model="user.password" @input="checkPassword">
+          <label :class="{success: isPasswordValid}" for="">校验通过</label>
+        </div>
+        <div class="form-group">
+          <label for="sex-male">性别</label>
+          <input type="radio" name="sex" value="男" v-model="user.sex">男
+          <input type="radio" name="sex" value="女" v-model="user.sex">女
+        </div>
+        <div class="form-group">
+          <label for="address">地址</label>
+          <!-- 下拉框 -->
+          <select v-model="user.address">
+            <option value="" disabled selected>请输入地址</option>
+            <option v-for="item in addressList" :value="item.name" :key="item.name">{{ item.name }}</option>
+          </select>
+        </div>
+
+        <div class="smbmit">
+          <button class="register" type="submit">注册</button>
+          <button class="update" @click="handleUpdate">修改</button>
+        </div>
+      </form>
+
+      <!-- table -->
+      <table class="table">
+        <thead>
+          <tr>
+            <th>用户名</th>
+            <th>密码</th>
+            <th>性别</th>
+            <th>地址</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr v-for="(item, index) in userList" :key="index">
+            <td>{{ item.name }}</td>
+            <td>{{ item.password }}</td>
+            <td>{{ item.sex }}</td>
+            <td>{{ item.address }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </template>
+  <script>
+    Vue.createApp({
+      template: '#root',
+      data() {
+        return {
+          userList: [
+            { name: '张三', password: '123456', sex: '男', address: '北京' },
+            { name: '李四', password: '123456', sex: '女', address: '上海' },
+            { name: '王五', password: '123456', sex: '男', address: '广州' }
+          ],
+          user: { name: '', password: '', sex: '', address: '' },
+          addressList: [
+            { id: 1, name: '北京' },
+            { id: 2, name: '上海' },
+            { id: 3, name: '广州' },
+            { id: 4, name: '深圳' }
+          ],
+          isUserNameValid: false,
+          isPasswordValid: false
+        }
+      },
+      methods: {
+        handleRegister() {
+          if (this.isUserNameValid && this.isPasswordValid) {
+            // 深度克隆 user 对象
+            const newUser = JSON.parse(JSON.stringify(this.user));
+            this.userList.push(newUser);
+            this.user = { name: '', password: '', sex: '', address: '' };
+            this.isUserNameValid = false;
+            this.isPasswordValid = false;
+          }
+        },
+        handleUpdate() {
+          console.log('修改用户', this.user);
+        },
+        checkUserName() {
+          this.isUserNameValid = this.user.name.length >= 3;
+        },
+        checkPassword() {
+          this.isPasswordValid = this.user.password.length >= 6;
+        }
+      }
+    }).mount("#app");
+  </script>
+</body>
+
+</html>

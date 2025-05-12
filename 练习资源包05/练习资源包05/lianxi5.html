@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>练习5</title>
+    <!-- 引入jQuery库 -->
+    <style>
+        #gameArea {
+            position: relative;
+            width: 1200px;
+            height: 700px;
+            background-color: #000;
+            overflow: hidden;
+        }
+        #player {
+            position: absolute;
+            top: 300px;
+            left: 350px;
+        }
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/jquery@3.7.1/dist/jquery.min.js"></script>
+</head>
+<body>
+    <div id="gameArea">
+        <img id="player" src="player1.gif" alt="Player">
+    </div>
+
+    <script>
+        // 229970507-封鉴纹
+        $(function() {
+            var player = $('#player');
+
+            // 移动
+            $(document).keydown(function(e) {
+                switch(e.which) {
+                    case 37: // 左
+                        player.css('left', function(_, val) {
+                            player.attr('src', 'player_left.gif');
+                            return parseInt(val, 10) - 5;
+                        });
+                        break;
+                    case 39: // 右
+                        player.css('left', function(_, val) {
+                            player.attr('src', 'player_right.gif');
+                            return parseInt(val, 10) + 5;
+                        });
+                        break;
+                    case 38: // 上
+                        player.css('top', function(_, val) {
+                            return parseInt(val, 10) - 5;
+                        });
+                        break;
+                    case 40: // 下
+                        player.css('top', function(_, val) {
+                            return parseInt(val, 10) + 5;
+                        });
+                        break;
+                }
+            });
+            // 点击屏幕移动到点击位置
+            $('#gameArea').on('click', function(e) {
+                // 获取点击位置的坐标
+                var x = e.pageX - $('#gameArea').offset().left; 
+                var y = e.pageY - $('#gameArea').offset().top;
+                player.css({
+                    left: x - player.width() / 2,
+                    top: y - player.height() / 2
+                });
+            });
+            // 双击更换图片
+            $('#gameArea').on('dblclick', function() {
+                var playerImg = player.attr('src'); // 获取当前图片路径
+                if (playerImg === 'player1.gif') {
+                    player.attr('src', 'player2.gif');
+                } else if (playerImg === 'player2.gif') {
+                    player.attr('src', 'player3.gif');
+                } else {
+                    player.attr('src', 'player1.gif');
+                }
+            });
+        });
+    </script>
+</body>
+</html>

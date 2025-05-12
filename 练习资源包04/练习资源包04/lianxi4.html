@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title>DOM操作-练习</title>
+    <style type="text/css">
+        body {
+            font-size: 13px;
+            line-height: 25px;
+        }
+        
+        table {
+            border-top: 1px solid #333;
+            border-left: 1px solid #333;
+            width: 300px;
+        }
+        
+        td {
+            border-right: 1px solid #333;
+            border-bottom: 1px solid #333;
+        }
+        
+        .center {
+            text-align: center;
+        }
+    </style>
+    <!-- 引入jQuery库 -->
+    <script src="https://cdn.jsdelivr.net/npm/jquery@3.7.1/dist/jquery.min.js"></script>
+</head>
+
+<body>
+    <table id="myTable">
+        <tr id="row1">
+            <td>书名</td>
+            <td>价格</td>
+        </tr>
+        <tr>
+            <td>看得见风景的房间</td>
+            <td class="center">&yen;30.00</td>
+        </tr>
+        <tr>
+            <td>60个瞬间</td>
+            <td class="center">&yen;32.00</td>
+        </tr>
+    </table>
+    
+    <button name="b1" type="button">增加一行</button>
+    <button name="b2" type="button">删除第2行</button>
+    <button name="b3" type="button">修改标题样式</button>
+    <button name="b4" type="button">复制最后一行</button>
+    <script>
+        // 229970507-封鉴纹
+        $(function() {
+            // 增加一行
+            $("button[name='b1']").click(function() {
+                const newRow = $("<tr>")
+                    .append($("<td>").text("幸福从天而降"))
+                    .append($("<td>").addClass("center").html("&yen;18.50"));
+                $("#myTable").append(newRow);
+            });
+
+            // 删除第二行
+            $("button[name='b2']").click(function() {
+                const rows = $("#myTable tr");
+                if (rows.length > 2) { 
+                    rows.eq(2).remove(); 
+                }
+            });
+
+            // 修改标题样式
+            $("button[name='b3']").click(function() {
+                $("#row1")
+                    .addClass("table-header")
+                    .find("td") 
+                    .addBack() // 包含自身
+                    .css({"text-align": "center", "background-color": "#ccc"});
+            });
+
+            // 复制最后一行
+            $("button[name='b4']").click(function() {
+                const lastRow = $("#myTable tr:last");
+                if (lastRow.attr("id") !== "row1") { // 不复制标题行
+                    const clonedRow = lastRow.clone();
+                    clonedRow.removeAttr("id"); // 移除ID防止重复
+                    $("#myTable").append(clonedRow);
+                }
+            });
+        });
+    </script>
+</body>
+</html>

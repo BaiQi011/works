@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>vue3</title>
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+</head>
+<body>
+    <div id="app" v-if="isShow">{{ count }}</div>
+    <button @click="shade()">切换</button>
+    <script>
+        // 应用实例
+        const app = Vue.createApp({
+            data(){
+                return{
+                    count:0,
+                    isShow:true
+                }
+            },
+            mounted(){
+                const that = this
+                setInterval(() => {
+                    console.log(1111);
+                    that.count++
+                }, 1000);
+            },
+            methods:{
+                shade(){
+                    this.isShow = !this.isShow
+                }
+            },
+        })
+        const root = app.mount("#app") //根组件实例
+        // this是组件实例
+    </script>
+</body>
+</html>
