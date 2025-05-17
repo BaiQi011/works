@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>小米商城购物车</title>
+  <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+  <style>
+    /* 小米商城核心配色 */
+    :root {
+      --primary-color: #ff6700; /* 小米橙色 */
+      --border-color: #e0e0e0;
+      --text-color: #333;
+      --sub-text-color: #666;
+    }
+
+    /* 全局样式 */
+    body {
+      font-family: "PingFang SC", "Helvetica Neue", Helvetica, Arial, sans-serif;
+      margin: 0;
+      background-color: #f5f5f5;
+    }
+
+    /* 容器 */
+    #app {
+      margin: auto;
+    }
+
+    /* 头部 */
+    .cart-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 2px solid #ff5700;
+      margin-bottom: 60px;
+      padding: 20px 360px;
+      background-color: #fff;
+    }
+
+    .cart-header img {
+      width: 50px;
+      height: 50px;
+      vertical-align: middle;
+    }
+
+    .cart-header h2 {
+      display: inline-block;
+      font-size: 20px;
+      font-weight: 400;
+      margin-left: 15px;
+      vertical-align: middle;
+    }
+
+    .cart-header span {
+      font-size: 14px;
+      color: var(--sub-text-color);
+      margin: 16px 0 0 15px;
+    }
+
+    /* 表格样式 */
+    .cart-table {
+      width: 100%;
+      max-width: 1226px;
+      border-collapse: collapse;
+      margin-top: 10px;
+      background-color: #fff;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    /* 表格样式 */
+    .cart-table th,
+    .cart-table td {
+        padding: 15px 30px;
+        border-bottom: 1px solid var(--border-color); /* 统一边框 */
+        font-size: 14px;
+        color: var(--text-color);
+        text-align: center; /* 表头和内容居中对齐 */
+    }
+
+    .cart-table .goods-name {
+        text-align: left;
+    }
+
+    .cart-table th {
+        font-weight: 400;
+        text-align: center; 
+    }
+
+    .cart-table td {
+      text-align: center;
+    }
+
+    .cart-table .th-checkbox,
+    .cart-table .td-checkbox {
+      text-align: center; /* 复选框列居中 */
+    }
+
+    /* 复选框 */
+    .mi-checkbox {
+      width: 20px;
+      height: 20px;
+      vertical-align: middle;
+      appearance: none;
+      border: 1px solid #c7c7c7;
+      outline: none;
+      cursor: pointer;
+      margin-right: 5px;
+    }
+
+    .mi-checkbox:checked {
+      background-color: var(--primary-color);
+      border-color: var(--primary-color);
+      background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg viewBox='0 0 10 10' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1.75 5L4.25 7.5L8.25 2.5' stroke='white' stroke-width='2'/%3E%3C/svg%3E");
+      background-size: 60%;
+      background-position: center;
+      background-repeat: no-repeat;
+    }
+
+    /* 商品名称 */
+    .goods-name {
+      font-size: 14px;
+      display: flex;
+      align-items: center;
+      color: var(--text-color);
+    }
+
+    .goods-img {
+        width: 100px;
+        height: 100px;
+        object-fit: cover;
+        margin-right: 10px;
+        margin-bottom: 10px;
+        cursor: pointer;
+    }
+
+    /* 数量操作 */
+    .count-control {
+      display: inline-flex;
+      border: 1px solid var(--border-color);
+      border-radius: 3px;
+    }
+
+    .count-control button {
+      width: 30px;
+      height: 30px;
+      /* background-color: #f5f5f5; */
+      border: none;
+      cursor: pointer;
+      font-size: 16px;
+      color: #666;
+    }
+
+    .count-control button:hover {
+      background-color: #e0e0e0;
+    }
+
+    .count-control span {
+      width: 50px;
+      height: 30px;
+      line-height: 30px;
+      text-align: center;
+      border-left: 1px solid var(--border-color);
+      border-right: 1px solid var(--border-color);
+    }
+
+    /* 价格 */
+    .cart-table .price {
+      color: #ff5700;
+      font-size: 20px;
+    }
+
+    /* 底部结算栏 */
+    .cart-footer {
+      position: fixed; /* 固定底部 */
+      left: 0;
+      right: 0;
+      bottom: 0;
+      height: 60px;
+      background-color: #fff;
+      border-top: 1px solid var(--border-color);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0 0 0 30px;
+    }
+
+    .footer-left {
+      display: flex;
+      align-items: center;
+    }
+
+    .footer-left span {
+      font-size: 14px;
+      color: var(--primary-color);
+    }
+    .footer-left p {
+      font-size: 14px;
+      color: var(--sub-text-color);
+      margin-right: 20px;
+    }
+
+    .footer-right {
+      display: flex;
+      align-items: center;
+      height: 100%;
+    }
+
+    .total-price {
+      font-size: 14px;
+      color: var(--primary-color);
+      margin-right: 20px;
+    }
+
+    .total-price strong {
+      color: var(--primary-color);
+      font-size: 30px;
+      font-weight: 500;
+    }
+
+    .btn-pay {
+      width: 240px;
+      height: 60px;
+      background-color: var(--primary-color);
+      border: none;
+      color: #fff;
+      font-size: 20px;
+      cursor: pointer;
+      transition: background-color 0.3s;
+    }
+
+    .btn-pay:hover {
+      background-color: #ff5700;
+    }
+  </style>
+</head>
+
+<body>
+  <div id="app"></div>
+  <template id="root">
+    <div>
+      <!-- 头部 -->
+      <div class="cart-header">
+        <div>
+          <img src="./logo.png" alt="小米商标">
+          <h2>我的购物车</h2>
+          <span>温馨提示：产品是否购买成功，以最终下单为准哦，请尽快结算</span>
+        </div>
+        <span>登录 | 注册</span>
+      </div>
+
+      <table class="cart-table">
+        <thead>
+          <tr>
+            <th class="th-checkbox"><input type="checkbox" class="mi-checkbox" v-model="allChecked">全选</th>
+            <th>商品名称</th>
+            <th>单价</th>
+            <th>数量</th>
+            <th>小计</th>
+            <th>操作</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr v-for="item in goodsList" :key="item.id">
+            <td class="td-checkbox"><input type="checkbox" class="mi-checkbox" v-model="item.checked" :disabled="item.count===0"></td>
+            <td class="goods-name">
+                <img :src="item.img" alt="" class="goods-img">
+                {{ item.name }}
+            </td>
+            <td>{{ item.price }} 元</td>
+            <td>
+              <div class="count-control">
+                <button @click="decreaseCount(item)">-</button>
+                <span>{{ item.count }}</span>
+                <button @click="increaseCount(item)">+</button>
+              </div>
+            </td>
+            <td class="price">{{ item.price * item.count }} 元</td>
+            <td>
+              <span @click="deleteItem(item)" style="font-size: large; cursor: pointer;">×</span>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+
+      <!-- 底部结算栏 -->
+      <div class="cart-footer">
+        <div class="footer-left">
+          <p>继续购物 | </p>
+          <p>共 <span>{{ totalCount }}</span> 件商品</p>
+          <p>已选择 <span>{{ selectedCount }}</span> 件</p>
+        </div>
+        <div class="footer-right">
+          <span class="total-price">合计：<strong>{{ totalAll }}</strong> 元</span>
+          <button class="btn-pay" @click="pay">去结算</button>
+        </div>
+      </div>
+    </div>
+  </template>
+  <script>
+    Vue.createApp({
+      template: '#root',
+      data() {
+        return {
+          goodsList: [
+            { id: 1, name: '小米耳机', price: 1999, count: 1, checked: false, img:'./erji.png' },
+            { id: 2, name: '小米洗衣机', price: 5999, count: 1, checked: false, img:'./xiyiji.png' },
+            { id: 3, name: '小米饮水机', price: 249, count: 1, checked: false, img:'./yinsuiji.png' }
+          ]
+        }
+      },
+      computed: {
+        // 计算总价格
+        totalAll() {
+          return this.goodsList.reduce((sum, item) => item.checked ? sum + (item.price * item.count) : sum, 0);
+        },
+        allChecked: {
+          get() {
+            return this.goodsList.length > 0 && this.goodsList.every(item => item.checked && item.count > 0);
+          },
+          set(value) {
+            this.goodsList.forEach(item => {
+              if(item.count > 0) item.checked = value;
+            });
+          }
+        },
+        selectedCount() {
+          // 计算选中的商品数量 只计算选中且数量大于0的商品
+          return this.goodsList.filter(item => item.checked).reduce((sum, item) => sum + item.count, 0);
+        },
+        // 计算总数量
+        totalCount() {
+          return this.goodsList.reduce((sum, item) => sum + item.count, 0);
+        }
+      },
+      methods: {
+        // 增加商品数量
+        increaseCount(item) {
+          item.count = Math.min(item.count + 1, 99); // 限制最大数量
+        },
+        // 减少商品数量
+        decreaseCount(item) {
+          item.count = Math.max(item.count - 1, 0);
+          if (item.count === 0) item.checked = false;
+        },
+        pay() {
+          if (this.selectedCount === 0) {
+            alert('请选择要结算的商品');
+            return;
+          }
+          alert('正在前往结算页...');
+        },
+        // 删除商品操作
+        deleteItem(item) {
+          const index = this.goodsList.indexOf(item);
+          if (index !== -1) {
+            this.goodsList.splice(index, 1);
+          }
+        }
+      }
+    }).mount("#app");
+  </script>
+</body>
+
+</html>

@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>小米商城登录注册</title>
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <style>
+        body {
+            margin: 0;
+            background: #fff;
+            font-family: "PingFang SC", "Helvetica Neue", Helvetica, Arial, sans-serif;
+            overflow-x: hidden;
+        }
+        .main-box {
+            display: flex;
+        }
+        .left-img {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .left-img img {
+            max-width: 400px;
+            max-height: 945px;
+        }
+        .right-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+            align-items: center;
+            background: #fff;
+            position: relative;
+        }
+        .top-bar {
+            width: 100%;
+            text-align: right;
+            padding: 24px 40px 0 0;
+            color: #888;
+            font-size: 14px;
+        }
+        .logo-bar {
+            display: flex;
+            align-items: center;
+            margin: 40px 0 30px 0;
+            width: 80%;
+            max-width: 400px;
+        }
+        .logo-bar img {
+            width: 32px;
+            margin-right: 10px;
+        }
+        .logo-bar span {
+            font-size: 22px;
+            color: #333;
+            font-weight: bold;
+        }
+        .form-box {
+            background: #fff;
+            border-radius: 12px;
+            box-shadow: 0 2px 16px rgba(0,0,0,0.08);
+            padding: 36px 36px 24px 36px;
+            width: 360px;
+            margin: 0 auto;
+        }
+        .tab-bar {
+            display: flex;
+            border-bottom: 1px solid #eee;
+            margin-bottom: 24px;
+        }
+        .tab-bar div {
+            flex: 1;
+            text-align: center;
+            font-size: 20px;
+            padding: 8px 0;
+            cursor: pointer;
+            color: #888;
+            font-weight: 500;
+            border-bottom: 2px solid transparent;
+            transition: color 0.2s, border-color 0.2s;
+        }
+        .tab-bar .active {
+            color: #ff6700;
+            border-bottom: 2px solid #ff6700;
+            font-weight: bold;
+        }
+        .form-group {
+            margin-bottom: 18px;
+            position: relative;
+        }
+        .form-group label {
+            display: block;
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 6px;
+        }
+        .form-group input, .form-group select {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 15px;
+            box-sizing: border-box;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+        .form-group input:focus {
+            border-color: #ff6700;
+        }
+        .form-group .code-btn {
+            position: absolute;
+            right: 8px;
+            top: 32px;
+            background-color: none;
+            color: #ff6700;
+            border: none;
+            border-radius: 3px;
+            padding: 4px 10px;
+            font-size: 13px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        .form-group .code-btn[disabled] {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+        .form-group .checkbox-label {
+            display: flex;
+            align-items: center;
+            font-size: 13px;
+            color: #888;
+        }
+        .form-group .checkbox-label input[type="checkbox"] {
+            margin-right: 6px;
+        }
+        .checkbox-label a {
+            color: #000000;
+            font-weight: bold;
+            text-decoration: none;
+        }
+        .submit-btn {
+            width: 100%;
+            background: #ff6700;
+            color: #fff;
+            border: none;
+            border-radius: 4px;
+            font-size: 17px;
+            padding: 12px 0;
+            margin-top: 10px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        .submit-btn:disabled {
+            background: #ffd3b3;
+            cursor: not-allowed;
+        }
+        .form-links {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 10px;
+            font-size: 13px;
+        }
+        .form-links a {
+            color: #ff6700;
+            text-decoration: none;
+        }
+        .other-login {
+            margin-top: 24px;
+            text-align: center;
+            color: #888;
+            font-size: 14px;
+        }
+        .icon-list {
+            margin-top: 12px;
+            display: flex;
+            justify-content: center;
+            gap: 18px;
+        }
+        .icon-list img {
+            border-radius: 50%;
+            padding: 8px;
+            cursor: pointer;
+            transition: box-shadow 0.2s;
+        }
+        .icon-list img:hover {
+            box-shadow: 0 2px 8px #ff670033;
+        }
+        @media (max-width: 900px) {
+            .main-box { flex-direction: column; }
+            .left-img { width: 100vw; min-width: 0; height: 200px; }
+            .right-content { min-width: 0; }
+        }
+    </style>
+</head>
+<body>
+    <div id="app"></div>
+    <template id="root">
+        <div class="main-box">
+            <div class="left-img">
+                <img src="./img/xiaomi-login-left.png" alt="小米宇航员">
+            </div>
+            <div class="right-content">
+                <div class="top-bar">
+                    用户协议&nbsp;&nbsp;|&nbsp;&nbsp;隐私政策&nbsp;&nbsp;|&nbsp;&nbsp;帮助中心&nbsp;&nbsp;|&nbsp;&nbsp;中文(简体)
+                </div>
+                <div class="logo-bar">
+                    <img src="https://www.mi.com/favicon.ico" alt="logo">
+                    <span>小米帐号</span>
+                </div>
+                <div class="form-box">
+                    <div class="tab-bar">
+                        <div :class="{active: tab==='login'}" @click="tab='login'">登录</div>
+                        <div :class="{active: tab==='register'}" @click="tab='register'">注册</div>
+                    </div>
+                    <login-form v-if="tab==='login'"
+                        :login-form="loginForm"
+                        @login="onLogin"
+                        @to-register="tab='register'">
+                    </login-form>
+                    <register-form v-else
+                        :reg-form="regForm"
+                        :code-sent="codeSent"
+                        :code-text="codeText"
+                        :country-list="countryList"
+                        @send-code="sendCode"
+                        @register="onRegister"
+                        @to-login="tab='login'">
+                    </register-form>
+                </div>
+            </div>
+        </div>
+    </template>
+
+    <template id="login-form">
+        <form @submit.prevent="$emit('login')">
+            <div class="form-group">
+                <label>邮箱/手机号/小米ID</label>
+                <input type="text" v-model="loginForm.username" placeholder="请输入账号">
+            </div>
+            <div class="form-group">
+                <label>密码</label>
+                <input type="password" v-model="loginForm.password" placeholder="请输入密码">
+            </div>
+            <checkbox-label :login-form="loginForm"></checkbox-label>
+            <button class="submit-btn" type="submit">登录</button>
+            <div class="form-links">
+                <a href="#">忘记密码?</a>
+                <a href="#" @click.prevent="$emit('to-register')">手机号码登录</a>
+            </div>
+        </form>
+        <div class="other-login">
+            其他方式登录
+            <div class="icon-list">
+                <img :src="icon.src" alt="支付宝" v-for="icon in iconList" :key="icon.alt">
+            </div>
+        </div>
+    </template>
+    <template id="register-form">
+    <form @submit.prevent="$emit('register')">
+        <div class="form-group">
+            <label>国家/地区</label>
+            <select v-model="regForm.country" style="height:48px;">
+                <option v-for="county in countryList" :key="county">{{ county }}</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label>手机号</label>
+            <input type="text" v-model="regForm.phone" placeholder="请输入手机号" style="height:48px;">
+        </div>
+        <div class="form-group" style="position:relative;">
+            <label>验证码</label>
+            <input type="text" v-model="regForm.code" placeholder="请输入验证码" style="padding-right:100px;height:48px;">
+            <button type="button" class="code-btn" :disabled="codeSent" @click="$emit('send-code')">{{codeText}}</button>
+        </div>
+        <checkbox-label :login-form="regForm"></checkbox-label>
+        <button class="submit-btn" type="submit">注册</button>
+        <div class="form-links">
+            <a href="#" @click.prevent="$emit('to-login')">已有帐号？去登录</a>
+            <span style="color:#ff6700; cursor: pointer;">收不到验证码?</span>
+        </div>
+    </form>
+</template>
+
+    <template id="checkbox-label">
+        <div class="checkbox-label">
+            <input type="checkbox" v-model="loginForm.agree">
+            已阅读并同意小米帐号
+            <a href="#">用户协议</a> 和 <a href="#">隐私政策</a>
+        </div>
+    </template>
+    <script>
+        const app = Vue.createApp({
+            template: '#root',
+            data() {
+                return {
+                    tab: 'login',
+                    loginForm: {
+                        username: '',
+                        password: '',
+                        agree: false
+                    },
+                    regForm: {
+                        country: '中国',
+                        phone: '',
+                        code: '',
+                        password: '',
+                        agree: false
+                    },
+                    codeSent: false,
+                    codeText: '获取验证码',
+                    codeValue: '',
+                    timer: null,
+                    countryList: ['中国', '美国', '日本', '英国']
+                }
+            },
+            methods: {
+                sendCode() {
+                    if (this.codeSent) return;
+                    this.codeValue = String(Math.floor(100000 + Math.random() * 900000));
+                    alert('您的验证码是：' + this.codeValue);
+                    this.codeSent = true;
+                    let count = 60;
+                    this.codeText = count + 's';
+                    this.timer = setInterval(() => {
+                        count--;
+                        this.codeText = count + 's';
+                        if (count <= 0) {
+                            clearInterval(this.timer);
+                            this.codeSent = false;
+                            this.codeText = '获取验证码';
+                        }
+                    }, 1000);
+                },
+                onLogin() {
+                    if (!this.loginForm.username || !this.loginForm.password) {
+                        alert('请输入账号和密码');
+                        return;
+                    }
+                    if (!this.loginForm.agree) {
+                        alert('请勾选协议');
+                        return;
+                    }
+                    alert('登录信息：' + JSON.stringify(this.loginForm, null, 2));
+                },
+                onRegister() {
+                    if (!this.regForm.phone || !this.regForm.code) {
+                        alert('请填写完整信息');
+                        return;
+                    }
+                    if (this.regForm.code !== this.codeValue) {
+                        alert('验证码错误');
+                        return;
+                    }
+                    if (!this.regForm.agree) {
+                        alert('请勾选协议');
+                        return;
+                    }
+                    alert('注册信息：' + JSON.stringify(this.regForm, null, 2));
+                }
+            }
+        });
+
+        // 登录表单组件
+        app.component('login-form', {
+            template: '#login-form',
+            props: ['loginForm'],
+            data() {
+                return {
+                    iconList: [
+                        { src: './img/zfb.png', alt: '支付宝' },
+                        { src: './img/wx.png', alt: '微信' },
+                        { src: './img/qq.png', alt: 'QQ' },
+                        { src: './img/wb.png', alt: '微博' }
+                    ]
+                }
+            }
+        });
+
+        // 注册表单组件
+        app.component('register-form', {
+            template: '#register-form',
+            props: ['regForm', 'codeSent', 'codeText', 'countryList'],
+        });
+
+        // 复选框组件
+        app.component('checkbox-label', {
+            template: '#checkbox-label',
+            props: ['loginForm']
+        });
+
+        app.mount('#app');
+    </script>
+</body>
+</html>

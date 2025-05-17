@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>组件测试1</title>
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+</head>
+<body>
+    <div id="app"></div>
+    <template id="root">
+        <head :mtitle="title"></head>
+    </template>
+    <template id="head">
+        <logo></logo>
+        <title></title>
+    </template>
+    <template id="logo">
+        <img :src="logo1" alt="logo">
+    </template>
+    <template id="title">
+        <span>{{ title }}</span>
+    </template>
+    <script>
+        const app = Vue.createApp({
+            template: '#root',
+            data() {
+                return {
+                    title: '欢迎注册'
+                }
+            },
+            components: {
+                head: {
+                    template: '#head',
+                    data() {
+                        return {
+                            logo: 'https://www.mi.com/favicon.ico'
+                        }
+                    },
+                    props: ['mtitle'],
+                }
+            }
+        })
+        
+        // 全局组件注册
+        app.component('logo', {
+            template: '#logo',
+            props:['logo1'],
+        })
+        app.component('title', {
+            template: '#title',
+            props: {
+                title: {
+                    type: [String, null],
+                    validator(value, props) {
+                        return ['欢迎登录', '欢迎注册'].includes(value)
+                    }
+                },
+            },
+        })
+        app.mount('#app')
+    </script>
+</body>
+</html>

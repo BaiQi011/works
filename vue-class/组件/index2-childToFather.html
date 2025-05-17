@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>子传父</title>
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+</head>
+<body>
+    <div id="app"></div>
+    <template id="root">
+        <div>
+            <h2>{{ title }}</h2>
+            <span>{{ message }}</span>
+            <childcomponent @hello-event="handleHelloEvent" v-model="message"></childcomponent>
+        </div>
+    </template>
+    <template id="childcomponent">
+        <div>
+            <h2>{{ title }}</h2>
+            <button @click="sendToFather">点击我</button>
+            <input type="text" name="" :value="modelValue" @input="change($event)" />
+            <deepchildcomponent></deepchildcomponent>
+        </div>
+    </template>
+    <template id="deepchildcomponent">
+        <div>
+            <h2>{{ title }}</h2>
+            <span>{{ msg }}</span>
+        </div>
+    <script>
+        const app = Vue.createApp({
+            template: '#root',
+            data() {
+                return {
+                    title: '父组件',
+                    message: 123
+                }
+            },
+            provide: {
+                msg: 'hello grandson'
+            },
+            methods: {
+                handleHelloEvent(msg) {
+                    this.message = msg
+                    console.log('父组件接收到子组件的消息：', msg)
+                }
+            },
+        })
+        app.component('childcomponent', {
+            template: '#childcomponent',
+            $emit: ['hello-event'],// 对发送的事件进行声明
+            props: ['modelValue'],
+            data() {
+                return {
+                    title: '子组件',
+                }
+            },
+            methods: {
+                sendToFather() {
+                    // 通过 $emit 发送，触发父组件的事件
+                    this.$emit('hello-event', 'father good morning')
+                },
+                change(event) {
+                    // 通过 $emit 发送，触发父组件的事件
+                    this.$emit('update:modelValue', event.target.value)
+                }
+            }
+        })
+        app.component('deepchildcomponent', {
+            template: '#deepchildcomponent',
+            inject: ['msg'], // 注入爷爷组件的值
+            data() {
+                return {
+                    title: '深层子组件', // 父组件的子组件的子组件
+                }
+            }
+        })
+        app.mount('#app')
+    </script>
+</body>
+</html>

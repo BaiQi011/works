@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>子传子</title>
+    <script src="https://unpkg.com/mitt/dist/mitt.umd.js"></script>
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+</head>
+<body>
+    <div id="app"></div>
+    <template id="root">
+        <div>
+            <child-component-a></child-component-a>
+            <child-component-b></child-component-b>
+        </div>
+    </template>
+    <!-- ChildComponentA -->
+    <template id="ChildComponentA">
+        <button @click="sendMessage">发送消息到 B</button>
+    </template>
+    <!-- ChildComponentB -->
+    <template id="ChildComponentB">
+        <div>
+            <p>接收到的消息：{{ receivedMessage.text }}</p>
+            <p>时间：{{ receivedMessage.timestamp }}</p>
+        </div>
+    </template>
+
+    <script>
+        // 在引入 Vue 之后、创建应用之前
+        window.emitter = mitt();
+
+        const app = Vue.createApp({
+            template: '#root'
+        });
+
+        app.component('ChildComponentA', {
+            template: '#ChildComponentA',
+            methods: {
+                sendMessage() {
+                    window.emitter.emit('message-to-b', {
+                        text: '来自组件 A 的消息',
+                        timestamp: new Date().toLocaleString()
+                    });
+                }
+            }
+        });
+
+        app.component('ChildComponentB', {
+            template: '#ChildComponentB',
+            data() {
+                return {
+                    receivedMessage: { text: '', timestamp: '' }
+                };
+            },
+            mounted() {
+                // 监听事件
+                this.handler = (data) => {
+                    this.receivedMessage = data;
+                };
+                window.emitter.on('message-to-b', this.handler);
+            },
+            beforeUnmount() {
+                // 卸载事件
+                window.emitter.off('message-to-b', this.handler);
+            }
+        });
+
+        app.mount('#app');
+    </script>
+</body>
+</html>

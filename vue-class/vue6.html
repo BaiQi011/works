@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>订单</title>
+  <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+</head>
+
+<body>
+  <div id="app"></div>
+  <template id="root">
+    <div>
+        <div><input type="checkbox" v-model="allChecked">全选</div>
+        <table class="table" border="1">
+            <thead>
+            <tr>
+                <th></th>
+                <th>名称</th>
+                <th>单价</th>
+                <th>数量</th>
+                <th>小计</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr v-for="item in goodsList" :key="item.id">
+                <td><input type="checkbox" v-model="item.checked"></td>
+                <td>{{ item.name }}</td>
+                <td>{{ item.price }}</td>
+                <td>
+                    <button @click="increaseCount(item)">+</button>
+                    {{ item.count }}
+                    <button @click="decreaseCount(item)">-</button>
+                </td>
+                <td>{{ item.total }} 元</td>
+            </tr>
+            </tbody>
+        </table>
+        <div>
+            总价：{{ totalAll }} 元
+        </div>
+    </div>
+  </template>
+  <script>
+    Vue.createApp({
+      template: '#root',
+      data() {
+        return {
+          goodsList: [
+            {id:1, name:'洗衣机', price:100, count:0, checked:false},
+            {id:2, name:'电视剧', price:200, count:0, checked:false},
+            {id:3, name:'饮水机', price:300, count:0, checked:false}
+          ]
+        }
+      },
+      computed: {
+        // 计算所有选中商品的总价
+        totalAll() {
+          return this.goodsList.reduce((sum, item) => {
+            return item.checked ? sum + item.total : sum;
+          }, 0);
+        },
+        // 全选状态计算
+        allChecked: {
+          get() {
+            return this.goodsList.every(item => item.checked && item.count > 0);
+          },
+          set(value) {
+            this.goodsList.forEach(item => {
+              if (item.count > 0) item.checked = value;
+            });
+          }
+        }
+      },
+      methods: {
+        // 增加数量
+        increaseCount(item) {
+          item.count++;
+          this.updateTotal(item);
+        },
+        // 减少数量
+        decreaseCount(item) {
+          if (item.count > 0) {
+            item.count--;
+            this.updateTotal(item);
+          }
+        },
+        // 更新小计
+        updateTotal(item) {
+          item.total = item.price * item.count;
+          // 如果数量为0，取消选中状态
+          if (item.count === 0) item.checked = false;
+        }
+      },
+      // 初始化商品小计
+      created() {
+        this.goodsList.forEach(item => {
+          item.total = item.price * item.count;
+        });
+      }
+    }).mount("#app");
+  </script>
+</body>
+
+</html>

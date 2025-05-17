@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>组件1</title>
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+</head>
+<body>
+    <div id="app"></div>
+    <template id="root">
+        {{ message }}
+        <mycomponent :tip="tip"></mycomponent>
+        <mycomponent2></mycomponent2>
+    </template>
+    <template id="mycomponent">
+        <div>{{ message }}-------{{ tip }}</div>
+    </template>
+    <template id="mycomponent2">
+        <div>{{ message }}</div>
+    </template>
+    <script>
+        const app = Vue.createApp({
+            template: '#root',
+            data() {
+                return {
+                    message:'组件注册',
+                    notice: 'hello mycomponent',
+                    tip:'success'
+                }
+            },
+            // 组件局部注册-只能放到根组件
+            components: {
+                mycomponent2: {
+                    template: '#mycomponent2',
+                    data() {
+                        return {
+                            message:'组件注册成功2'
+                        }
+                    }
+                }
+            }
+        })
+        
+        // 全局组件注册--放到哪里都可以
+        app.component('mycomponent', {
+            template: '#mycomponent',
+            data() {
+                return {
+                    message: '组件注册成功'
+                }
+            },
+            // props:['notice'],// 对外声明我可以接收一个叫做notice的属性
+            props: {
+                tip: {
+                    type: [String, null],
+                    validator(value, props) {
+                        // 校验值，props传入的值只能是success、warning、danger，不是则警告
+                        return ['success', 'warning', 'danger'].includes(value)
+                    }
+                }
+            },
+        })
+        app.mount('#app')
+    </script>
+</body>
+</html>
