@@ -29,7 +29,7 @@
 
     <script>
         // 在引入 Vue 之后、创建应用之前
-        window.emitter = mitt();
+        const emitter = mitt();
 
         const app = Vue.createApp({
             template: '#root'
@@ -39,7 +39,7 @@
             template: '#ChildComponentA',
             methods: {
                 sendMessage() {
-                    window.emitter.emit('message-to-b', {
+                    emitter.emit('message-to-b', {
                         text: '来自组件 A 的消息',
                         timestamp: new Date().toLocaleString()
                     });
@@ -59,11 +59,11 @@
                 this.handler = (data) => {
                     this.receivedMessage = data;
                 };
-                window.emitter.on('message-to-b', this.handler);
+                emitter.on('message-to-b', this.handler);
             },
             beforeUnmount() {
                 // 卸载事件
-                window.emitter.off('message-to-b', this.handler);
+                emitter.off('message-to-b', this.handler);
             }
         });
 

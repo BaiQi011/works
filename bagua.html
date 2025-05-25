@@ -1,0 +1,821 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>3D八卦阵 | Three.js + Vue3</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.min.js"></script>
+    <script src="https://unpkg.com/three@0.160.0/examples/js/controls/OrbitControls.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vue@3.4.27/dist/vue.global.prod.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="icon" href="https://www.baidu.com/favicon.ico">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#2D3748',
+                        secondary: '#4A5568',
+                        accent: '#ED8936',
+                        light: '#E2E8F0',
+                        dark: '#1A202C'
+                    },
+                    fontFamily: {
+                        inter: ['Inter', 'sans-serif'],
+                    },
+                }
+            }
+        }
+    </script>
+    
+    <style type="text/tailwindcss">
+        @layer utilities {
+            .content-auto {
+                content-visibility: auto;
+            }
+            .text-shadow {
+                text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            }
+            .bg-blur {
+                backdrop-filter: blur(8px);
+            }
+            .animate-spin-slow {
+                animation: spin 20s linear infinite;
+            }
+            .animate-pulse-slow {
+                animation: pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+            }
+        }
+    </style>
+</head>
+<body class="font-inter bg-gradient-to-br from-dark to-primary min-h-screen text-light overflow-x-hidden">
+    <div id="app">
+        <!-- 导航栏 -->
+        <nav class="fixed top-0 left-0 right-0 z-50 bg-dark/80 bg-blur border-b border-accent/20 transition-all duration-300">
+            <div class="container mx-auto px-4 py-3 flex justify-between items-center">
+                <div class="flex items-center space-x-2">
+                    <div class="w-8 h-8 rounded-full bg-gradient-to-r from-accent to-yellow-400 flex items-center justify-center">
+                        <i class="fa fa-compass text-dark"></i>
+                    </div>
+                    <h1 class="text-xl font-bold text-light">3D<span class="text-accent">八卦阵</span></h1>
+                </div>
+                
+                <div class="hidden md:flex items-center space-x-6">
+                    <a href="#" class="text-light hover:text-accent transition-colors duration-200">首页</a>
+                    <a href="#features" class="text-light hover:text-accent transition-colors duration-200">特点</a>
+                    <a href="#controls" class="text-light hover:text-accent transition-colors duration-200">控制</a>
+                    <a href="#about" class="text-light hover:text-accent transition-colors duration-200">关于</a>
+                </div>
+                
+                <div class="md:hidden">
+                    <button @click="toggleMenu" class="text-light focus:outline-none">
+                        <i class="fa fa-bars text-xl"></i>
+                    </button>
+                </div>
+            </div>
+            
+            <!-- 移动端菜单 -->
+            <div v-show="mobileMenuOpen" class="md:hidden bg-dark/95 bg-blur transition-all duration-300">
+                <div class="container mx-auto px-4 py-3 flex flex-col space-y-4">
+                    <a href="#" class="text-light hover:text-accent transition-colors duration-200 py-2 border-b border-accent/10">首页</a>
+                    <a href="#features" class="text-light hover:text-accent transition-colors duration-200 py-2 border-b border-accent/10">特点</a>
+                    <a href="#controls" class="text-light hover:text-accent transition-colors duration-200 py-2 border-b border-accent/10">控制</a>
+                    <a href="#about" class="text-light hover:text-accent transition-colors duration-200 py-2">关于</a>
+                </div>
+            </div>
+        </nav>
+
+        <!-- 主内容区 -->
+        <main class="pt-16">
+            <!-- 3D场景容器 -->
+            <section class="relative h-[80vh] flex items-center justify-center overflow-hidden">
+                <div class="absolute inset-0 bg-gradient-to-b from-primary/80 to-dark/90 z-10"></div>
+                <div id="scene-container" class="absolute inset-0 z-20"></div>
+                
+                <div class="absolute bottom-10 left-0 right-0 z-30 text-center">
+                    <div class="inline-block px-6 py-3 bg-dark/60 bg-blur rounded-full border border-accent/30">
+                        <p class="text-light text-sm md:text-base">
+                            <i class="fa fa-mouse-pointer text-accent mr-2"></i>
+                            拖动鼠标旋转视角 | 滚轮缩放 | 双击重置
+                        </p>
+                    </div>
+                </div>
+            </section>
+            
+            <!-- 控制面板 -->
+            <section id="controls" class="py-12 bg-dark/50 border-t border-b border-accent/20">
+                <div class="container mx-auto px-4">
+                    <h2 class="text-2xl md:text-3xl font-bold mb-8 text-center text-light">
+                        <span class="inline-block pb-2 border-b-2 border-accent">场景控制</span>
+                    </h2>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        <!-- 旋转控制 -->
+                        <div class="bg-dark/40 p-6 rounded-lg border border-accent/20 transform transition-all duration-300 hover:scale-[1.02] hover:shadow-lg hover:shadow-accent/10">
+                            <h3 class="text-xl font-semibold mb-4 text-light flex items-center">
+                                <i class="fa fa-refresh text-accent mr-2"></i>
+                                旋转控制
+                            </h3>
+                            <div class="space-y-4">
+                                <div>
+                                    <label class="block text-sm mb-1 text-light/80">旋转速度</label>
+                                    <input type="range" min="0" max="0.1" step="0.001" 
+                                        v-model.number="rotationSpeed" 
+                                        class="w-full h-2 bg-secondary rounded-lg appearance-none cursor-pointer accent-accent">
+                                    <div class="flex justify-between text-xs text-light/60 mt-1">
+                                        <span>慢</span>
+                                        <span>快</span>
+                                    </div>
+                                </div>
+                                <div>
+                                    <button @click="toggleAutoRotate" 
+                                        class="w-full py-2 bg-accent hover:bg-accent/80 text-dark font-medium rounded transition-colors duration-200">
+                                        {{ autoRotate ? '停止旋转' : '开始旋转' }}
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- 视角控制 -->
+                        <div class="bg-dark/40 p-6 rounded-lg border border-accent/20 transform transition-all duration-300 hover:scale-[1.02] hover:shadow-lg hover:shadow-accent/10">
+                            <h3 class="text-xl font-semibold mb-4 text-light flex items-center">
+                                <i class="fa fa-eye text-accent mr-2"></i>
+                                视角控制
+                            </h3>
+                            <div class="space-y-4">
+                                <div>
+                                    <label class="block text-sm mb-1 text-light/80">视角预设</label>
+                                    <select v-model="viewPreset" 
+                                        class="w-full p-2 bg-secondary/50 border border-accent/30 rounded text-light focus:outline-none focus:ring-1 focus:ring-accent">
+                                        <option value="top">顶部视角</option>
+                                        <option value="front">正面视角</option>
+                                        <option value="side">侧面视角</option>
+                                        <option value="diagonal">对角视角</option>
+                                    </select>
+                                </div>
+                                <div class="grid grid-cols-2 gap-2">
+                                    <button @click="setView('top')" 
+                                        class="py-2 bg-secondary/50 hover:bg-secondary text-light font-medium rounded transition-colors duration-200">
+                                        顶视图
+                                    </button>
+                                    <button @click="setView('front')" 
+                                        class="py-2 bg-secondary/50 hover:bg-secondary text-light font-medium rounded transition-colors duration-200">
+                                        正视图
+                                    </button>
+                                    <button @click="setView('side')" 
+                                        class="py-2 bg-secondary/50 hover:bg-secondary text-light font-medium rounded transition-colors duration-200">
+                                        侧视图
+                                    </button>
+                                    <button @click="setView('diagonal')" 
+                                        class="py-2 bg-secondary/50 hover:bg-secondary text-light font-medium rounded transition-colors duration-200">
+                                        斜视图
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- 特效控制 -->
+                        <div class="bg-dark/40 p-6 rounded-lg border border-accent/20 transform transition-all duration-300 hover:scale-[1.02] hover:shadow-lg hover:shadow-accent/10">
+                            <h3 class="text-xl font-semibold mb-4 text-light flex items-center">
+                                <i class="fa fa-magic text-accent mr-2"></i>
+                                特效控制
+                            </h3>
+                            <div class="space-y-4">
+                                <div>
+                                    <label class="block text-sm mb-1 text-light/80">光照强度</label>
+                                    <input type="range" min="0" max="2" step="0.1" 
+                                        v-model.number="lightIntensity" 
+                                        class="w-full h-2 bg-secondary rounded-lg appearance-none cursor-pointer accent-accent">
+                                </div>
+                                <div>
+                                    <label class="block text-sm mb-1 text-light/80">粒子数量</label>
+                                    <input type="range" min="0" max="1000" step="50" 
+                                        v-model.number="particleCount" 
+                                        class="w-full h-2 bg-secondary rounded-lg appearance-none cursor-pointer accent-accent">
+                                </div>
+                                <div class="flex space-x-2">
+                                    <button @click="toggleParticles" 
+                                        class="flex-1 py-2 bg-accent hover:bg-accent/80 text-dark font-medium rounded transition-colors duration-200">
+                                        {{ showParticles ? '隐藏粒子' : '显示粒子' }}
+                                    </button>
+                                    <button @click="toggleWireframe" 
+                                        class="flex-1 py-2 bg-secondary hover:bg-secondary/80 text-light font-medium rounded transition-colors duration-200">
+                                        {{ showWireframe ? '隐藏网格' : '显示网格' }}
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            
+            <!-- 特点介绍 -->
+            <section id="features" class="py-16 bg-gradient-to-b from-primary/70 to-dark/90">
+                <div class="container mx-auto px-4">
+                    <h2 class="text-2xl md:text-3xl font-bold mb-12 text-center text-light">
+                        <span class="inline-block pb-2 border-b-2 border-accent">八卦阵特点</span>
+                    </h2>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                        <div class="bg-dark/30 p-6 rounded-lg border border-accent/20 transform transition-all duration-300 hover:scale-[1.03] hover:shadow-lg hover:shadow-accent/10">
+                            <div class="w-12 h-12 bg-accent/20 rounded-full flex items-center justify-center mb-4">
+                                <i class="fa fa-cube text-accent text-xl"></i>
+                            </div>
+                            <h3 class="text-xl font-semibold mb-2 text-light">3D立体呈现</h3>
+                            <p class="text-light/70">基于Three.js构建的真实3D场景，展现八卦阵的立体结构和空间层次，支持多角度观察。</p>
+                        </div>
+                        
+                        <div class="bg-dark/30 p-6 rounded-lg border border-accent/20 transform transition-all duration-300 hover:scale-[1.03] hover:shadow-lg hover:shadow-accent/10">
+                            <div class="w-12 h-12 bg-accent/20 rounded-full flex items-center justify-center mb-4">
+                                <i class="fa fa-refresh text-accent text-xl"></i>
+                            </div>
+                            <h3 class="text-xl font-semibold mb-2 text-light">动态交互</h3>
+                            <p class="text-light/70">支持自由旋转、缩放和视角切换，可观察八卦阵的每一个细节，感受其运动变化的韵律。</p>
+                        </div>
+                        
+                        <div class="bg-dark/30 p-6 rounded-lg border border-accent/20 transform transition-all duration-300 hover:scale-[1.03] hover:shadow-lg hover:shadow-accent/10">
+                            <div class="w-12 h-12 bg-accent/20 rounded-full flex items-center justify-center mb-4">
+                                <i class="fa fa-sun-o text-accent text-xl"></i>
+                            </div>
+                            <h3 class="text-xl font-semibold mb-2 text-light">光影效果</h3>
+                            <p class="text-light/70">精心设计的光照系统，模拟自然光效和阴影，增强视觉层次感和立体感，突显传统美学。</p>
+                        </div>
+                        
+                        <div class="bg-dark/30 p-6 rounded-lg border border-accent/20 transform transition-all duration-300 hover:scale-[1.03] hover:shadow-lg hover:shadow-accent/10">
+                            <div class="w-12 h-12 bg-accent/20 rounded-full flex items-center justify-center mb-4">
+                                <i class="fa fa-code text-accent text-xl"></i>
+                            </div>
+                            <h3 class="text-xl font-semibold mb-2 text-light">技术融合</h3>
+                            <p class="text-light/70">结合Vue3的响应式设计与Three.js的强大3D渲染能力，打造流畅、直观的用户体验。</p>
+                        </div>
+                        
+                        <div class="bg-dark/30 p-6 rounded-lg border border-accent/20 transform transition-all duration-300 hover:scale-[1.03] hover:shadow-lg hover:shadow-accent/10">
+                            <div class="w-12 h-12 bg-accent/20 rounded-full flex items-center justify-center mb-4">
+                                <i class="fa fa-mobile text-accent text-xl"></i>
+                            </div>
+                            <h3 class="text-xl font-semibold mb-2 text-light">响应式设计</h3>
+                            <p class="text-light/70">完全适配移动设备和桌面平台，在任何屏幕尺寸上都能呈现最佳视觉效果和交互体验。</p>
+                        </div>
+                        
+                        <div class="bg-dark/30 p-6 rounded-lg border border-accent/20 transform transition-all duration-300 hover:scale-[1.03] hover:shadow-lg hover:shadow-accent/10">
+                            <div class="w-12 h-12 bg-accent/20 rounded-full flex items-center justify-center mb-4">
+                                <i class="fa fa-book text-accent text-xl"></i>
+                            </div>
+                            <h3 class="text-xl font-semibold mb-2 text-light">文化内涵</h3>
+                            <p class="text-light/70">准确还原传统八卦阵的象征意义和哲学思想，将古老智慧与现代技术完美结合。</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            
+            <!-- 关于部分 -->
+            <section id="about" class="py-16 bg-dark/80">
+                <div class="container mx-auto px-4">
+                    <div class="max-w-3xl mx-auto text-center">
+                        <h2 class="text-2xl md:text-3xl font-bold mb-6 text-light">
+                            <span class="inline-block pb-2 border-b-2 border-accent">关于八卦阵</span>
+                        </h2>
+                        <p class="text-light/70 mb-8 leading-relaxed">
+                            八卦阵是中国古代军事家和哲学家发明的一种战术阵型，源于《易经》的八卦理论。
+                            它将天、地、水、火、风、雷、山、泽八种自然现象融入阵型变化，体现了古代中国人对宇宙规律的深刻理解。
+                            本项目通过现代3D技术，将这一古老智慧以全新的方式呈现，让用户可以直观感受八卦阵的结构之美和哲学内涵。
+                        </p>
+                        <div class="flex flex-wrap justify-center gap-4">
+                            <a href="#" class="px-6 py-2 bg-accent hover:bg-accent/80 text-dark font-medium rounded transition-colors duration-200">
+                                <i class="fa fa-github mr-2"></i>查看源码
+                            </a>
+                            <a href="#" class="px-6 py-2 bg-secondary/50 hover:bg-secondary/80 text-light font-medium rounded transition-colors duration-200">
+                                <i class="fa fa-info-circle mr-2"></i>了解更多
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+        
+        <!-- 页脚 -->
+        <footer class="py-8 bg-dark border-t border-accent/20">
+            <div class="container mx-auto px-4">
+                <div class="flex flex-col md:flex-row justify-between items-center">
+                    <div class="mb-4 md:mb-0">
+                        <div class="flex items-center space-x-2">
+                            <div class="w-6 h-6 rounded-full bg-gradient-to-r from-accent to-yellow-400 flex items-center justify-center">
+                                <i class="fa fa-compass text-dark text-xs"></i>
+                            </div>
+                            <span class="text-light font-medium">3D八卦阵</span>
+                        </div>
+                    </div>
+                    
+                    <div class="text-light/60 text-sm">
+                        &copy; 2025 3D八卦阵演示项目 | 使用Three.js和Vue3构建
+                    </div>
+                    
+                    <div class="flex space-x-4 mt-4 md:mt-0">
+                        <a href="#" class="text-light/60 hover:text-accent transition-colors duration-200">
+                            <i class="fa fa-github text-xl"></i>
+                        </a>
+                        <a href="#" class="text-light/60 hover:text-accent transition-colors duration-200">
+                            <i class="fa fa-twitter text-xl"></i>
+                        </a>
+                        <a href="#" class="text-light/60 hover:text-accent transition-colors duration-200">
+                            <i class="fa fa-linkedin text-xl"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </footer>
+    </div>
+
+    <script>
+        const OrbitControls = THREE.OrbitControls;
+        
+        // Vue3应用
+        const app = Vue.createApp({
+            data() {
+                return {
+                    mobileMenuOpen: false,
+                    autoRotate: true,
+                    rotationSpeed: 0.005,
+                    viewPreset: 'diagonal',
+                    lightIntensity: 1.5,
+                    showParticles: true,
+                    particleCount: 500,
+                    showWireframe: false,
+                    
+                    // 3D场景相关
+                    scene: null,
+                    camera: null,
+                    renderer: null,
+                    controls: null,
+                    baguaGroup: null,
+                    particles: null,
+                    clock: new THREE.Clock(),
+                    
+                    // 视角预设
+                    viewPresets: {
+                        top: { position: [0, 15, 0], lookAt: [0, 0, 0] },
+                        front: { position: [0, 5, 15], lookAt: [0, 0, 0] },
+                        side: { position: [15, 5, 0], lookAt: [0, 0, 0] },
+                        diagonal: { position: [10, 8, 10], lookAt: [0, 0, 0] }
+                    }
+                }
+            },
+            mounted() {
+                this.initThreeJS();
+                this.createBagua();
+                this.createParticles();
+                
+                // 延迟设置视角，确保控制器已初始化
+                setTimeout(() => {
+                    this.setView(this.viewPreset);
+                    this.controls.autoRotate = this.autoRotate;
+                }, 100);
+                
+                this.animate();
+                
+                // 窗口大小调整事件
+                window.addEventListener('resize', this.onWindowResize);
+            },
+            beforeUnmount() {
+                window.removeEventListener('resize', this.onWindowResize);
+                
+                // 清理Three.js资源
+                if (this.renderer) {
+                    this.renderer.dispose();
+                }
+            },
+            methods: {
+                // 初始化Three.js
+                initThreeJS() {
+                    const container = document.getElementById('scene-container');
+
+                    // 创建场景
+                    this.scene = new THREE.Scene();
+                    this.scene.background = new THREE.Color(0x1A202C);
+
+                    // 创建相机
+                    this.camera = new THREE.PerspectiveCamera(
+                        75, 
+                        container.clientWidth / container.clientHeight, 
+                        0.1, 
+                        1000
+                    );
+
+                    // 创建渲染器
+                    this.renderer = new THREE.WebGLRenderer({ 
+                        antialias: true,
+                        alpha: false
+                    });
+                    this.renderer.setSize(container.clientWidth, container.clientHeight);
+                    this.renderer.setPixelRatio(window.devicePixelRatio);
+                    container.appendChild(this.renderer.domElement);
+
+                    // 现在 renderer 已经有了，可以创建 OrbitControls
+                    const Controls = THREE.OrbitControls || window.OrbitControls;
+                    this.controls = new OrbitControls(this.camera, this.renderer.domElement);
+                    this.controls.enableDamping = true;
+                    this.controls.dampingFactor = 0.1;
+                    this.controls.rotateSpeed = 0.5;
+                    this.controls.zoomSpeed = 0.8;
+
+                    // 添加灯光
+                    const ambientLight = new THREE.AmbientLight(0x404040, 0.5);
+                    this.scene.add(ambientLight);
+
+                    const directionalLight = new THREE.DirectionalLight(0xffffff, this.lightIntensity);
+                    directionalLight.position.set(5, 10, 7);
+                    directionalLight.castShadow = true;
+                    this.scene.add(directionalLight);
+
+                    const hemisphereLight = new THREE.HemisphereLight(0xffffbb, 0x080820, 0.5);
+                    this.scene.add(hemisphereLight);
+
+                    // 添加地面网格
+                    const gridHelper = new THREE.GridHelper(20, 20, 0x333333, 0x222222);
+                    this.scene.add(gridHelper);
+                },
+                
+                // 创建八卦阵
+                createBagua() {
+                    this.baguaGroup = new THREE.Group();
+                    this.scene.add(this.baguaGroup);
+                    
+                    // 八卦底盘
+                    const baseGeometry = new THREE.CylinderGeometry(8, 8, 0.2, 64);
+                    const baseMaterial = new THREE.MeshStandardMaterial({
+                        color: 0x2D3748,
+                        roughness: 0.8,
+                        metalness: 0.2
+                    });
+                    const base = new THREE.Mesh(baseGeometry, baseMaterial);
+                    base.receiveShadow = true;
+                    this.baguaGroup.add(base);
+                    
+                    // 阴阳鱼
+                    this.createYinYang();
+                    
+                    // 八卦符号
+                    this.createBaguaSymbols();
+                },
+                
+                // 创建阴阳鱼
+                createYinYang() {
+                    const radius = 6;
+                    const segments = 64;
+                    
+                    // 创建阴阳鱼路径
+                    const shape = new THREE.Shape();
+                    
+                    // 外部圆
+                    shape.absarc(0, 0, radius, 0, Math.PI * 2, false);
+                    
+                    // 内部半圆路径
+                    const holePath = new THREE.Path();
+                    
+                    // 左侧阴鱼
+                    holePath.absarc(-radius/2, 0, radius/2, Math.PI/2, 3*Math.PI/2, true);
+                    shape.holes.push(holePath);
+                    
+                    // 右侧阳鱼
+                    holePath.absarc(radius/2, 0, radius/2, Math.PI/2, 3*Math.PI/2, false);
+                    shape.holes.push(holePath);
+                    
+                    // 创建几何体
+                    const geometry = new THREE.ShapeGeometry(shape);
+                    
+                    // 材质
+                    const material = new THREE.MeshStandardMaterial({
+                        color: 0xffffff,
+                        side: THREE.DoubleSide,
+                        roughness: 0.6,
+                        metalness: 0.3
+                    });
+                    
+                    const yinYang = new THREE.Mesh(geometry, material);
+                    yinYang.position.y = 0.21; // 略高于底盘
+                    yinYang.rotation.x = Math.PI / 2;
+                    this.baguaGroup.add(yinYang);
+                    
+                    // 阴鱼中的阳点
+                    const yangDotGeometry = new THREE.CircleGeometry(radius/6, segments);
+                    const yangDotMaterial = new THREE.MeshStandardMaterial({
+                        color: 0xffffff,
+                        roughness: 0.5,
+                        metalness: 0.8
+                    });
+                    const yangDot = new THREE.Mesh(yangDotGeometry, yangDotMaterial);
+                    yangDot.position.set(-radius/2, 0.22, 0);
+                    yangDot.rotation.x = Math.PI / 2;
+                    this.baguaGroup.add(yangDot);
+                    
+                    // 阳鱼中的阴点
+                    const yinDotGeometry = new THREE.CircleGeometry(radius/6, segments);
+                    const yinDotMaterial = new THREE.MeshStandardMaterial({
+                        color: 0x000000,
+                        roughness: 0.5,
+                        metalness: 0.8
+                    });
+                    const yinDot = new THREE.Mesh(yinDotGeometry, yinDotMaterial);
+                    yinDot.position.set(radius/2, 0.22, 0);
+                    yinDot.rotation.x = Math.PI / 2;
+                    this.baguaGroup.add(yinDot);
+                    
+                    // 边缘线条
+                    const edgeGeometry = new THREE.RingGeometry(radius - 0.1, radius, segments);
+                    const edgeMaterial = new THREE.MeshStandardMaterial({
+                        color: 0xED8936,
+                        side: THREE.DoubleSide,
+                        roughness: 0.3,
+                        metalness: 0.7
+                    });
+                    const edge = new THREE.Mesh(edgeGeometry, edgeMaterial);
+                    edge.position.y = 0.23;
+                    edge.rotation.x = Math.PI / 2;
+                    this.baguaGroup.add(edge);
+                },
+                
+                // 创建八卦符号
+                createBaguaSymbols() {
+                    const radius = 7;
+                    const symbols = [
+                        // 乾 (天)
+                        { name: "乾", lines: [1, 1, 1], angle: 0, color: 0xf5f5f5 },
+                        // 兑 (泽)
+                        { name: "兑", lines: [1, 1, 0], angle: Math.PI / 4, color: 0xffcc99 },
+                        // 离 (火)
+                        { name: "离", lines: [1, 0, 1], angle: Math.PI / 2, color: 0xff6666 },
+                        // 震 (雷)
+                        { name: "震", lines: [1, 0, 0], angle: 3 * Math.PI / 4, color: 0xffff99 },
+                        // 巽 (风)
+                        { name: "巽", lines: [0, 1, 1], angle: Math.PI, color: 0x99ff99 },
+                        // 坎 (水)
+                        { name: "坎", lines: [0, 1, 0], angle: 5 * Math.PI / 4, color: 0x6699ff },
+                        // 艮 (山)
+                        { name: "艮", lines: [0, 0, 1], angle: 3 * Math.PI / 2, color: 0xcc9966 },
+                        // 坤 (地)
+                        { name: "坤", lines: [0, 0, 0], angle: 7 * Math.PI / 4, color: 0x333333 }
+                    ];
+                    
+                    // 八卦符号组
+                    const symbolsGroup = new THREE.Group();
+                    symbolsGroup.position.y = 0.4; // 高于阴阳鱼
+                    this.baguaGroup.add(symbolsGroup);
+                    
+                    // 创建每个符号
+                    symbols.forEach((symbol, index) => {
+                        const symbolGroup = new THREE.Group();
+                        
+                        // 计算位置
+                        const x = radius * Math.cos(symbol.angle);
+                        const z = radius * Math.sin(symbol.angle);
+                        symbolGroup.position.set(x, 0, z);
+                        
+                        // 旋转朝向中心
+                        symbolGroup.rotation.y = symbol.angle + Math.PI / 2;
+                        
+                        // 创建爻线
+                        const lineWidth = 1.2;
+                        const lineThickness = 0.1;
+                        const lineGap = 0.3;
+                        
+                        symbol.lines.forEach((line, lineIndex) => {
+                            const yPos = lineIndex * (lineThickness + lineGap);
+                            
+                            if (line === 1) {
+                                // 阳爻 (完整线)
+                                const lineGeometry = new THREE.BoxGeometry(lineWidth, lineThickness, 0.2);
+                                const lineMaterial = new THREE.MeshStandardMaterial({
+                                    color: symbol.color,
+                                    roughness: 0.7,
+                                    metalness: 0.2
+                                });
+                                const lineMesh = new THREE.Mesh(lineGeometry, lineMaterial);
+                                lineMesh.position.y = yPos;
+                                symbolGroup.add(lineMesh);
+                            } else {
+                                // 阴爻 (断开线)
+                                const gap = 0.4;
+                                
+                                const leftLineGeometry = new THREE.BoxGeometry((lineWidth - gap) / 2, lineThickness, 0.2);
+                                const rightLineGeometry = new THREE.BoxGeometry((lineWidth - gap) / 2, lineThickness, 0.2);
+                                
+                                const lineMaterial = new THREE.MeshStandardMaterial({
+                                    color: symbol.color,
+                                    roughness: 0.7,
+                                    metalness: 0.2
+                                });
+                                
+                                const leftLineMesh = new THREE.Mesh(leftLineGeometry, lineMaterial);
+                                const rightLineMesh = new THREE.Mesh(rightLineGeometry, lineMaterial);
+                                
+                                leftLineMesh.position.set(-gap/4, yPos, 0);
+                                rightLineMesh.position.set(gap/4, yPos, 0);
+                                
+                                symbolGroup.add(leftLineMesh);
+                                symbolGroup.add(rightLineMesh);
+                            }
+                        });
+                        
+                        // 添加符号名称
+                        const textGeometry = new THREE.TextGeometry(symbol.name, {
+                            font: this.getFont(),
+                            size: 0.6,
+                            height: 0.05,
+                            curveSegments: 12,
+                            bevelEnabled: true,
+                            bevelThickness: 0.03,
+                            bevelSize: 0.02,
+                            bevelOffset: 0,
+                            bevelSegments: 5
+                        });
+                        
+                        const textMaterial = new THREE.MeshStandardMaterial({
+                            color: 0xED8936,
+                            roughness: 0.5,
+                            metalness: 0.7
+                        });
+                        
+                        const textMesh = new THREE.Mesh(textGeometry, textMaterial);
+                        textMesh.position.y = -0.5;
+                        textMesh.rotation.y = -Math.PI / 2; // 调整文字方向
+                        symbolGroup.add(textMesh);
+                        
+                        symbolsGroup.add(symbolGroup);
+                    });
+                    
+                    // 添加网格线
+                    if (this.showWireframe) {
+                        const wireframeGeometry = new THREE.EdgesGeometry(symbolsGroup.geometry);
+                        const wireframeMaterial = new THREE.LineBasicMaterial({ color: 0xED8936, linewidth: 2 });
+                        const wireframe = new THREE.LineSegments(wireframeGeometry, wireframeMaterial);
+                        symbolsGroup.add(wireframe);
+                    }
+                },
+                
+                // 创建粒子效果
+                createParticles() {
+                    if (this.particles) {
+                        this.scene.remove(this.particles);
+                    }
+                    
+                    const particlesGeometry = new THREE.BufferGeometry();
+                    const particlesCount = this.particleCount;
+                    
+                    const positions = new Float32Array(particlesCount * 3);
+                    const colors = new Float32Array(particlesCount * 3);
+                    
+                    const color1 = new THREE.Color(0xED8936);
+                    const color2 = new THREE.Color(0x6699ff);
+                    
+                    for (let i = 0; i < particlesCount; i++) {
+                        const i3 = i * 3;
+                        
+                        // 随机位置，集中在八卦阵上方
+                        positions[i3] = (Math.random() * 2 - 1) * 10; // x
+                        positions[i3 + 1] = Math.random() * 5 + 1;   // y
+                        positions[i3 + 2] = (Math.random() * 2 - 1) * 10; // z
+                        
+                        // 随机颜色插值
+                        const mix = Math.random();
+                        const color = color1.clone().lerp(color2, mix);
+                        
+                        colors[i3] = color.r;
+                        colors[i3 + 1] = color.g;
+                        colors[i3 + 2] = color.b;
+                    }
+                    
+                    particlesGeometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+                    particlesGeometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
+                    
+                    const particlesMaterial = new THREE.PointsMaterial({
+                        size: 0.1,
+                        vertexColors: true,
+                        transparent: true,
+                        opacity: 0.8,
+                        sizeAttenuation: true
+                    });
+                    
+                    this.particles = new THREE.Points(particlesGeometry, particlesMaterial);
+                    this.scene.add(this.particles);
+                },
+                
+                // 获取字体（使用默认字体）
+                getFont() {
+                    // 在实际应用中，你可能需要加载特定的字体
+                    // 这里使用Three.js的默认字体
+                    return new THREE.Font();
+                },
+                
+                // 设置视角
+                setView(preset) {
+                    if (!this.controls) return;
+                    
+                    const { position, lookAt } = this.viewPresets[preset];
+                    this.camera.position.set(...position);
+                    this.controls.target.set(...lookAt);
+                    this.viewPreset = preset;
+                    
+                    // 平滑过渡到新视角
+                    this.controls.update();
+                },
+                
+                // 窗口大小调整
+                onWindowResize() {
+                    const container = document.getElementById('scene-container');
+                    if (!this.camera || !this.renderer) return;
+                    
+                    this.camera.aspect = container.clientWidth / container.clientHeight;
+                    this.camera.updateProjectionMatrix();
+                    this.renderer.setSize(container.clientWidth, container.clientHeight);
+                },
+                
+                // 切换自动旋转
+                toggleAutoRotate() {
+                    this.autoRotate = !this.autoRotate;
+                    if (this.controls) {
+                        this.controls.autoRotate = this.autoRotate;
+                    }
+                },
+                
+                // 切换粒子显示
+                toggleParticles() {
+                    this.showParticles = !this.showParticles;
+                    if (this.particles) {
+                        this.particles.visible = this.showParticles;
+                    }
+                },
+                
+                // 切换网格线显示
+                toggleWireframe() {
+                    this.showWireframe = !this.showWireframe;
+                    // 重新创建八卦符号以应用网格线设置
+                    if (this.baguaGroup) {
+                        // 移除现有的符号
+                        const symbolsGroup = this.baguaGroup.children.find(child => child.name === 'symbolsGroup');
+                        if (symbolsGroup) {
+                            this.baguaGroup.remove(symbolsGroup);
+                        }
+                        
+                        // 重新创建符号
+                        const newSymbolsGroup = new THREE.Group();
+                        newSymbolsGroup.name = 'symbolsGroup';
+                        newSymbolsGroup.position.y = 0.4;
+                        this.baguaGroup.add(newSymbolsGroup);
+                        
+                        this.createBaguaSymbols();
+                    }
+                },
+                
+                // 动画循环
+                animate() {
+                    if (!this.renderer || !this.scene || !this.camera) return;
+                    
+                    requestAnimationFrame(this.animate);
+                    
+                    // 更新控制器
+                    if (this.controls) {
+                        this.controls.update();
+                    }
+                    
+                    // 更新粒子效果
+                    if (this.particles && this.showParticles) {
+                        const time = Date.now() * 0.001;
+                        const positions = this.particles.geometry.attributes.position.array;
+                        
+                        for (let i = 0; i < positions.length; i += 3) {
+                            // 让粒子上下浮动
+                            positions[i + 1] = Math.sin(time + i * 0.1) * 0.1 + positions[i + 1];
+                        }
+                        
+                        this.particles.geometry.attributes.position.needsUpdate = true;
+                    }
+                    
+                    // 更新旋转速度
+                    if (this.controls) {
+                        this.controls.autoRotateSpeed = this.rotationSpeed * 20;
+                    }
+                    
+                    // 更新灯光强度
+                    const directionalLight = this.scene.children.find(child => child.type === 'DirectionalLight');
+                    if (directionalLight) {
+                        directionalLight.intensity = this.lightIntensity;
+                    }
+                    
+                    // 渲染场景
+                    this.renderer.render(this.scene, this.camera);
+                },
+                
+                // 切换移动端菜单
+                toggleMenu() {
+                    this.mobileMenuOpen = !this.mobileMenuOpen;
+                }
+            }
+        });
+        
+        // 挂载应用
+        app.mount('#app');
+    </script>
+</body>
+</html>

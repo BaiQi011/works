@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>插槽</title>
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <style>
+        .header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: #ff6700;
+            color: #fff;
+            padding: 12px 18px;
+            border-radius: 8px;
+            font-size: 18px;
+        }
+        .back-botton {
+            width: 36px;
+            height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(255,255,255,0.15);
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 22px;
+            transition: background 0.2s;
+        }
+        .back-botton:hover {
+            background: rgba(255,255,255,0.3);
+        }
+        .header input[type="text"] {
+            width: 180px;
+            padding: 6px 10px;
+            border: none;
+            border-radius: 4px;
+            font-size: 16px;
+            outline: none;
+            color: #333;
+        }
+        body {
+            background: #fff7ef;
+            min-height: 100vh;
+            margin: 0;
+            font-family: 'Segoe UI', 'Arial', sans-serif;
+        }
+        #app {
+            max-width: 480px;
+            margin: 40px auto;
+        }
+    </style>
+</head>
+<body>
+    <div id="app"></div>
+    <template id="root">
+        <!-- <header-bar>
+            <template #center>
+                <input type="text" placeholder="搜索...">
+            </template>
+            <template #right>
+                <div class="search-botton">
+                    <span>&#128269;</span>
+                </div>
+            </template>
+        </header-bar> -->
+        <header-bar>
+            <!-- <template #center>
+                <span>个人中心</span>
+            </template> -->
+            <!-- 默认插槽/具名插槽+作用于插槽的属性 -->
+            <template #default="{ title, message }">
+                <span style="margin-left:10px;">{{ title }} | {{ message }}</span>
+            </template>
+            <template #right>
+                <button class="search-botton" style="background:#fff;color:#ff6700;font-size:16px;">设置</button>
+            </template>
+        </header-bar>
+    </template>
+    <template id="header-bar">
+        <div class="header">
+            <div class="back-botton">
+                <span>&#60;</span>
+            </div>
+            <!-- <div style="flex:1;display:flex;justify-content:center;">
+                <slot name="center"></slot>
+            </div> -->
+            <slot :title="title" :message="name"></slot>
+            <div>
+                <slot name="right"></slot>
+            </div>
+        </div>
+    </template>
+    <script>
+        const app = Vue.createApp({
+            template: "#root"
+        });
+        app.component('header-bar', {
+            template: '#header-bar',
+            data() {
+                return {
+                    title: '标题',
+                    name: '小米商城'
+                }
+            }
+        });
+        app.mount('#app');
+    </script>
+</body>
+</html>

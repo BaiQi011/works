@@ -1,0 +1,205 @@
+<head>
+  <meta charset="UTF-8">
+  <title>Mitt组件通信示例</title>
+  <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mitt@3.0.1/dist/mitt.umd.min.js"></script>
+  <style>
+    body {
+      background: #f3f4f6;
+      font-family: 'Segoe UI', Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+    }
+    .container {
+      max-width: 800px;
+      margin: 40px auto;
+      background: #fff;
+      border-radius: 12px;
+      box-shadow: 0 4px 16px #0001;
+      padding: 32px;
+    }
+    h1 {
+      text-align: center;
+      color: #3B82F6;
+      margin-bottom: 24px;
+    }
+    h2 {
+      color: #1F2937;
+      margin-top: 32px;
+      margin-bottom: 12px;
+    }
+    .card {
+      background: #f9fafb;
+      border-radius: 8px;
+      padding: 20px;
+      margin-bottom: 24px;
+      box-shadow: 0 2px 8px #0001;
+    }
+    .input-row {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 12px;
+    }
+    input[type="text"] {
+      flex: 1;
+      padding: 8px 12px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      font-size: 16px;
+    }
+    button {
+      background: #3B82F6;
+      color: #fff;
+      border: none;
+      border-radius: 4px;
+      padding: 8px 18px;
+      font-size: 16px;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    button:hover {
+      background: #2563eb;
+    }
+    .result {
+      background: #F3F4F6;
+      border-radius: 4px;
+      padding: 10px 14px;
+      margin-top: 10px;
+      color: #333;
+    }
+    .section {
+      margin-bottom: 36px;
+    }
+  </style>
+</head>
+<body>
+  <div id="app"></div>
+  <template id="root">
+    <div class="container">
+      <h1>Mitt组件通信示例</h1>
+      <p style="color:#666; background:#e0e7ef; border-radius:6px; padding:10px 18px; margin-bottom:24px;">
+         本页面采用“单向数据流+事件驱动”的设计思路，分别通过props和自定义事件实现父子组件通信，通过 mitt 实现非父子组件间的解耦事件通信。
+      </p>
+      <div class="section card">
+        <h2>父组件向子组件传值</h2>
+        <div class="input-row">
+          <input type="text" v-model="parentToChildMsg" placeholder="输入要传递的消息">
+          <button @click="sendToChild">发送给子组件</button>
+        </div>
+        <div class="result">
+          <child-component :message="parentToChildMsg"></child-component>
+        </div>
+      </div>
+
+      <div class="section card">
+        <h2>子组件向父组件传值</h2>
+        <child-to-parent @message-sent="updateParentMessage"></child-to-parent>
+        <div class="result">
+          <span v-if="childToParentMsg">{{ childToParentMsg }}</span>
+          <span v-else style="color:#888;">等待接收消息...</span>
+        </div>
+      </div>
+
+      <div class="section card">
+        <h2>非父子组件通信</h2>
+        <div class="input-row">
+          <component-a></component-a>
+          <component-b></component-b>
+        </div>
+      </div>
+    </div>
+  </template>
+
+  <template id="child-component">
+    <span>{{ message || '等待接收消息...' }}</span>
+  </template>
+
+  <template id="child-to-parent">
+    <div class="input-row">
+      <input type="text" v-model="message" placeholder="输入要传递的消息">
+      <button @click="sendMessage">发送给父组件</button>
+    </div>
+  </template>
+
+  <template id="component-a">
+    <input type="text" v-model="message" placeholder="输入要广播的消息">
+    <button @click="broadcastMessage">广播消息</button>
+  </template>
+
+  <template id="component-b">
+    <div class="result" style="min-width:120px;">
+      <div v-if="messages.length > 0">
+        <div v-for="(msg, i) in messages" :key="i">{{ msg }}</div>
+      </div>
+      <span v-else style="color:#888;">等待消息...</span>
+    </div>
+  </template>
+
+  <script>
+    const emitter = mitt();
+
+    const app = Vue.createApp({
+      template: '#root',
+      data() {
+        return {
+          parentToChildMsg: '',
+          childToParentMsg: ''
+        };
+      },
+      methods: {
+        sendToChild() {},
+        updateParentMessage(message) {
+          this.childToParentMsg = message;
+        }
+      }
+    })
+    // 父组件向子组件传值
+    app.component('child-component', {
+      template: '#child-component',
+      props: ['message']
+    });
+    // 子组件向父组件传值
+    app.component('child-to-parent', {
+      template: '#child-to-parent',
+      emits: ['message-sent'],
+      data() {
+        return { message: '' };
+      },
+      methods: {
+        sendMessage() {
+          this.$emit('message-sent', this.message);
+        }
+      }
+    });
+    // 组件A
+    app.component('component-a', {
+      template: '#component-a',
+      data() {
+        return { message: '' };
+      },
+      methods: {
+        broadcastMessage() {
+          emitter.emit('message', this.message);
+        }
+      }
+    });
+    // 组件B
+    app.component('component-b', {
+      template: '#component-b',
+      data() {
+        return { messages: [] };
+      },
+      created() {
+        emitter.on('message', (msg) => {
+          this.messages.unshift(msg);
+        });
+      },
+      beforeUnmount() {
+        emitter.off('message');
+      }
+    });
+
+    app.mount('#app');
+  </script>
+</body>
+</html>

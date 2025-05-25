@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>动态组件切换</title>
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <link rel="icon" href="https://www.baidu.com/favicon.ico">
+</head>
+<body>
+    <!-- const {ref} = Vue  :解构赋值 -->
+    <!-- 
+    <keep-alive>
+        <component :is="currentComponent"></component>
+    </keep-alive>
+    -->
+    <div id="app"></div>
+    <template id="root">
+        <product-list :list="list">
+            <template #list="{ list }">
+                <!-- <li>
+                    <h3>{{ item.name }}</h3>
+                    <p>价格：{{ item.price }}元</p>
+                </li> -->
+                <li v-for="item in list" :key="item.id">
+                    {{ item.name }} --- {{ item.price }}元
+                </li>
+            </template>
+        </product-list>
+    </template>
+
+    <template id="product-list">
+        <div>
+            <h2>商品列表</h2>
+            <ul>
+                <slot name="list" :list="list"></slot>
+            </ul>
+        </div>
+    </template>
+    <script>
+        const app = Vue.createApp({
+            template: "#root",
+            data() {
+                return {
+                    list: [
+                        { id: 1, name: '冰箱', price: 2000 },
+                        { id: 2, name: '洗衣机', price: 3000 },
+                        { id: 3, name: '电视', price: 4000 }
+                    ],
+                }
+            }
+        });
+        app.component('product-list', {
+            template: "#product-list",
+            props: ['list']
+        });
+        app.mount('#app');
+    </script>
+</body>
+</html>
