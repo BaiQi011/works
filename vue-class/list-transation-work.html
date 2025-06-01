@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>列表-过渡动画</title>
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <style>
+        body {
+            background: linear-gradient(135deg, #e0e7ff 0%, #f0fdfa 100%);
+            min-height: 100vh;
+            font-family: 'Segoe UI', Arial, sans-serif;
+        }
+        #app {
+            max-width: 420px;
+            margin: 40px auto;
+            background: #fff;
+            border-radius: 14px;
+            box-shadow: 0 4px 32px 0 rgba(59,130,246,0.10);
+            padding: 32px 24px 24px 24px;
+        }
+        h3 {
+            color: #2563eb;
+            margin-bottom: 10px;
+        }
+        .input-row {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 18px;
+        }
+        .input-row input {
+            flex: 1;
+            padding: 10px;
+            border: 1.5px solid #cbd5e1;
+            border-radius: 6px;
+            font-size: 1rem;
+            outline: none;
+        }
+        .input-row button {
+            padding: 10px 18px;
+            background: #2563eb;
+            color: #fff;
+            border: none;
+            border-radius: 6px;
+            font-size: 1rem;
+            cursor: pointer;
+        }
+        .input-row button:hover {
+            background: #1d4ed8;
+        }
+        .actions {
+            text-align: right;
+            margin-bottom: 10px;
+        }
+        .actions button {
+            background: #f87171;
+            color: #fff;
+            border: none;
+            border-radius: 6px;
+            padding: 6px 14px;
+            font-size: 0.95rem;
+            cursor: pointer;
+        }
+        .actions button:hover {
+            background: #dc2626;
+        }
+        ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        .my-enter-active, .my-leave-active, .my-move{
+            transition: all 1s linear;
+        }
+        .my-enter-from, .my-leave-to {
+            opacity: 0;
+        }
+        .my-leave-to {
+            transform: translateX(100px);
+        }
+        .my-enter-to, .my-leave-from {
+            opacity: 1;
+        }
+        li {
+            background: #f1f5f9;
+            border-radius: 6px;
+            margin-bottom: 8px;
+            padding: 8px 12px;
+            display: flex;
+            align-items: center;
+        }
+        li.done {
+            background: #e0e7ff;
+            text-decoration: line-through;
+            color: #94a3b8;
+        }
+        .task-btn {
+            margin-left: 8px;
+            background: #2563eb;
+            color: #fff;
+            border: none;
+            border-radius: 4px;
+            padding: 4px 10px;
+            font-size: 0.95rem;
+            cursor: pointer;
+        }
+        .task-btn:hover {
+            background: #1d4ed8;
+        }
+        .task-btn.delete {
+            background: #f87171;
+        }
+        .task-btn.delete:hover {
+            background: #dc2626;
+        }
+        .task-btn.editing {
+            background: #fbbf24;
+            color: #222;
+        }
+        .edit-input {
+            flex: 1;
+            margin-right: 8px;
+            border: 1px solid #2563eb;
+            border-radius: 4px;
+            padding: 4px 8px;
+            font-size: 1rem;
+        }
+        @media (max-width: 600px) {
+            #app {
+                max-width: 98vw;
+                padding: 18px 4vw;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="app"></div>
+    <template id="root">
+        <div>
+            <div class="input-row">
+                <input type="text" v-model="itemName" placeholder="输入待办事项" @keyup.enter="add">
+                <button @click="add">添加</button>
+            </div>
+            <div class="actions">
+                <button @click="clearAll" v-if="relist.length || list.length">清空所有</button>
+            </div>
+            <!-- 待定列表 -->
+            <relist :relist="relist" @finish="addList" @edit="editTask"></relist>
+            <!-- 已完成列表 -->
+            <list :list="list" @remove="removeList"></list>
+        </div>
+    </template>
+    <template id="relist">
+        <div>
+            <h3>待定列表</h3>
+            <transition-group name="my" tag="ul">
+                <li v-for="item in relist" :key="item.id">
+                    {{ item.text }}
+                    <button class="task-btn" @click="$emit('finish', item)">完成</button>
+                </li>
+                <li v-if="relist.length === 0" style="color:#94a3b8;text-align:center;">暂无待定任务</li>
+            </transition-group>
+        </div>
+    </template>
+    <template id="list">
+        <div>
+            <h3>已完成列表</h3>
+            <transition-group name="my" tag="ul">
+                <li v-for="item in list" :key="item.id" class="done">
+                    {{ item.text }}
+                    <button class="task-btn delete" @click="remove(item)">删除</button>
+                </li>
+                <li v-if="list.length === 0" style="color:#94a3b8;text-align:center;">暂无已完成任务</li>
+            </transition-group> 
+        </div>
+    </template>
+    <script>
+        const app = Vue.createApp({
+            template: "#root",
+            data() {
+                return {
+                    itemName: "",
+                    relist: [
+                        { id: 1, text: "张三", editing: false, editText: "" },
+                        { id: 2, text: "李四", editing: false, editText: "" }
+                    ],
+                    list: [
+                        { id: 3, text: "222" },
+                        { id: 4, text: "111" },
+                        { id: 5, text: "333" }
+                    ]
+                }
+            },
+            methods: {
+                add() {
+                    const name = this.itemName.trim();
+                    if (!name) {
+                        alert("请输入内容");
+                        return;
+                    }
+                    if (
+                        this.relist.some(item => item.text === name) ||
+                        this.list.some(item => item.text === name)
+                    ) {
+                        alert("该任务已存在！");
+                        return;
+                    }
+                    this.relist.push({ id: Date.now(), text: name });
+                    this.itemName = "";
+                },
+                addList(item) {
+                    this.list.push({ id: item.id, text: item.text });
+                    this.relist = this.relist.filter(i => i.id !== item.id);
+                },
+                removeList(item) {
+                    this.list = this.list.filter(i => i.id !== item.id);
+                },
+                clearAll() {
+                    if (confirm("确定要清空所有任务吗？")) {
+                        this.relist = [];
+                        this.list = [];
+                    }
+                }
+            }
+        });
+        app.component("relist", {
+            template: "#relist",
+            props: ["relist"],
+            methods: {
+                finish(item) {
+                    this.$emit("finish", item);
+                }
+            }
+        });
+        app.component("list", {
+            template: "#list",
+            props: ["list"],
+            methods: {
+                remove(item) {
+                    this.$emit("remove", item)
+                }
+            }
+        });
+        app.mount("#app")
+    </script>
+</body>
+</html>

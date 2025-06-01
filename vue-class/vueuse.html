@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VueUse 示例</title>
+    <link rel="icon" href="https://www.baidu.com/favicon.ico">
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <!-- <script src="https://unpkg.com/@vueuse/core@9.11.0/dist/index.iife.js"></script> -->
+    <script src="./js/mixins.js"></script> 
+    <style>
+        body {
+            background: #f3f4f6;
+            font-family: 'Segoe UI', Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+        #app {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+        .main-btn {
+            width: 160px;
+            height: 240px;
+            background: #2e8b57;
+            color: #fff;
+            font-size: 20px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+        .mask {
+            position: fixed;
+            left: 0; top: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.4);
+            z-index: 9999;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+        .mask-title {
+            color: #fff;
+            font-size: 48px;
+            margin-bottom: 24px;
+            letter-spacing: 2px;
+        }
+        .mask-close {
+            position: absolute;
+            right: 32px;
+            top: 24px;
+            width: 36px;
+            height: 36px;
+            background: #fff;
+            border-radius: 50%;
+            color: #333;
+            font-size: 28px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            border: none;
+        }
+    </style>
+</head>
+<body>
+    <div id="app"></div>
+    <template id="root">
+        <button class="main-btn" @click="showMask = true">按钮</button>
+        <teleport to="body">
+            <div v-if="showMask" class="mask">
+                <div class="mask-title">hello</div>
+                <button class="mask-close" @click="showMask = false">×</button>
+            </div>
+        </teleport>
+        <!-- <button @click="getName">mixins</button> -->
+    </template>
+    <script>
+        // 1.props父传子
+        // 2.emits子传父
+        // 3.provide/inject 夸层传值
+        // 4.eventBus 事件总线
+        const { ref } = Vue; // 从 Vue 全局对象中导入 ref
+        
+        const app = Vue.createApp({
+            template: "#root",
+            // mixins: [window.mixin],
+            setup() {
+                const showMask = ref(false);
+                return {
+                    showMask
+                }
+            }
+        });
+        app.mount('#app');
+    </script>
+</body>
+</html>
+    

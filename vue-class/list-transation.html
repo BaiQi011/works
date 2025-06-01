@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>列表-过度动画</title>
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
+    <style>
+        .my-enter-active, .my-leave-active, .my-move{
+            transition: all 1s linear;
+        }   
+        .my-enter-from, .my-leave-to {
+            opacity: 0;
+        }
+        .my-leave-to {
+            transform: translateX(100px); /* 动画结束之后，删除的元素，从右边开始向左移动100px */
+        }
+        .my-enter-to, .my-leave-from {
+            opacity: 1;
+        }
+    </style>
+</head>
+<body>
+    <div id="app"></div>
+    <template id="root">
+        <div>
+            <!-- tag:自己变成ul标签 -->
+            <transition-group name="my" tag="ul">
+                <li v-for="item in list" :key="item.name">
+                    {{ item.name }}---{{ item.age }}
+                </li>
+            </transition-group>
+            <button @click="add">添加</button>
+            <button @click="remove">删除</button>
+        </div>
+    </template>
+    <script>
+        const app = Vue.createApp({
+            template: "#root",
+            data() {
+                return {
+                    list: [
+                        { name: "张三", age:10},
+                        { name: "李四", age:20},
+                        { name: "王五", age:30}
+                    ]
+                }
+            },
+            methods: {
+                add() {
+                    this.list.splice(this.randomIndex(), 0, { name: `zs_${this.randomIndex()}`, age:20})
+                },
+                remove() {
+                    this.list.splice(this.randomIndex(), 1)
+                },
+                randomIndex() {
+                    return Math.floor(Math.random()*this.list.length) // 0~this.list.length-1
+                }
+            }
+        })
+        app.mount("#app")
+    </script>
+</body>
+</html>

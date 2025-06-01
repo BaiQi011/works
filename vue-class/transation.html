@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>过度动画</title>
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
+    <style>
+        .my-enter-active, .my-leave-active {
+            transition: opacity 1s linear;
+        }   
+        .my-enter-from, .my-leave-to {
+            opacity: 0;
+        }
+        .my-enter-to, .my-leave-from {
+            opacity: 1;
+        }
+    </style>
+</head>
+<body>
+    <div id="app"></div>
+    <template id="root">
+        <div>
+            <!-- out-in:  切换时，先执行离开动画，再执行进入动画  appear: 添加进入动画的初始状态  -->
+            <transition name="my" mode="out-in" appear>
+                <h1 v-if="show">{{ message }}</h1> 
+                <h1 v-else>{{ message2 }}</h1>
+            </transition>
+            <transition name="my2" enter-active-class="animate__animated animate__fadeInTopLeft" leave-active-class="animate__animated animate__fadeInTopRight">
+                <h2 v-if="show">{{ message }}</h2> 
+            </transition>
+            <button @click="show = !show">切换</button>
+        </div>
+    </template>
+    <script>
+        const app = Vue.createApp({
+            template: "#root",
+            data() {
+                return {
+                    message: "动画效果",
+                    message2: "动画效果2",
+                    show: true
+                }
+            }
+        })
+        app.mount("#app")
+    </script>
+</body>
+</html>

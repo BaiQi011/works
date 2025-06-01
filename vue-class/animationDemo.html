@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>过度动画</title>
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
+    <style>
+        .my-enter-active {
+            animation: myanimation 2s linear forwards;
+        }   
+        .my-leave-active {
+            animation: myanimation 2s linear reverse;
+        }
+        @keyframes myanimation {
+            0% { 
+                transform: scale(0);
+            }
+            25% { 
+                transform: scale(1);
+            }
+            50% { 
+                transform: scale(1.5);
+            }
+            75% { 
+                transform: scale(1);
+            }
+            100% { 
+                transform: scale(0);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="app"></div>
+    <template id="root">
+        <div>
+            <transition name="my">
+                <h1 v-if="show">{{ message }}</h1> 
+            </transition>
+            <button @click="show = !show">切换</button>
+        </div>
+    </template>
+    <script>
+        const app = Vue.createApp({
+            template: "#root",
+            data() {
+                return {
+                    message: "动画效果",
+                    show: true
+                }
+            }
+        })
+        app.mount("#app")
+    </script>
+</body>
+</html>

@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>表单传递表格</title>
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/mitt@3.0.1/dist/mitt.umd.min.js"></script>
+    <style>
+        form { margin: 20px; }
+        input { margin: 5px; padding: 5px; }
+        table { border-collapse: collapse; margin: 20px; }
+        th, td { border: 1px solid #ccc; padding: 8px; }
+    </style>
+</head>
+<body>
+    <div id="app"></div>
+    <template id="root">
+        <!-- 修改事件名以匹配HTML属性规则 -->
+        <form-comp @get-user="userMessage"></form-comp>
+        <table-comp :user-data="user"></table-comp>
+    </template>
+
+    <template id="form">
+        <form @submit.prevent="handleSubmit">
+            <div>
+                <label for="name">用户名:</label>
+                <input type="text" id="name" v-model="formData.name">
+            </div>
+            <div>
+                <label for="age">年龄:</label>
+                <input type="number" id="age" v-model="formData.age">
+            </div>
+            <button type="submit">提交</button>
+        </form>
+    </template>
+
+    <template id="table">
+        <table>
+            <thead>
+                <tr>
+                    <th>用户名</th>
+                    <th>年龄</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr v-for="(userData, index) in users" :key="index">
+                    <td>{{ userData.name }}</td>
+                    <td>{{ userData.age }}</td>
+                </tr>
+                <tr v-if="users.length === 0">
+                    <td colspan="2">暂无数据</td>
+                </tr>
+            </tbody>
+        </table>
+    </template>
+
+    <script>
+    const { ref, watch } = Vue;
+
+    const app = Vue.createApp({
+        template: "#root",
+        setup() {
+            const user = ref({
+                name: '',
+                age: null
+            });
+
+            const userMessage = (data) => {
+                user.value = data;
+                console.log('接收到的用户数据:', user.value);
+            };
+
+            return {
+                user,
+                userMessage
+            };
+        }
+    });
+
+    app.component('form-comp', {
+        template: '#form',
+        emits: ['getUser'],
+        setup(props, { emit }) {
+            const formData = ref({
+                name: '',
+                age: null
+            });
+
+            const handleSubmit = () => {
+                if (!formData.value.name) {
+                    alert('请输入用户名');
+                    return;
+                }
+                emit('getUser', formData.value);
+            };
+
+            return {
+                formData,
+                handleSubmit
+            }
+        }
+    });
+
+    app.component('table-comp', {
+        template: '#table',
+        props: {
+            userData: {
+                type: Object
+            }
+        },
+        setup(props) {
+            const users = ref([]);
+            // 监听 props.userData 的变化
+            watch(props, (newValue, oldValue) => {
+                users.value.push(newValue.userData);
+            },
+                { immediate: true }
+            );
+            return {
+                users
+            }
+        }
+    });
+
+    app.mount('#app');
+</script>
+</body>
+</html>
