@@ -30,7 +30,7 @@ const router = createRouter({
     },
   ],
 })
-
+// 229970507-封鉴纹
 // 路由守卫
 router.beforeEach((to, from, next) => {
   const isLogin = useLoginStore().isLogin
@@ -40,24 +40,13 @@ router.beforeEach((to, from, next) => {
     next()
     return
   }
-
-  // 其他页面需要登录
+  // 未登录
   if (!isLogin) {
     alert('请先登录')
     next('/login')
   } else {
     next()
   }
-  // if (to.path === '/mine') {
-  //   const name = to.params.name
-  //   if (name === 'zhangsan') {
-  //     next()
-  //   } else {
-  //     next('/')
-  //   }
-  // } else {
-  //   next()
-  // }
 })
 
 export default router
